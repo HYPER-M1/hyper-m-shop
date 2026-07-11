@@ -405,6 +405,43 @@
     @keyframes fadeIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
     @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 
+    /* ===== GLOBAL VIDEO BACKGROUND ===== */
+    .hero-video-container {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw; height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-video-el {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+      will-change: transform, opacity;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+    }
+    .bg-video-el.active {
+      opacity: 1;
+    }
+    .hero-video-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 15, 15, 0.45); /* 45% dark overlay for clear login form readability */
+      z-index: 2;
+    }
+
+    /* Fix Button Text merging by defining explicit modes */
+    .btn-auth span.signup-only { display: inline-block !important; }
+    .btn-auth span.signin-only { display: none !important; }
+    body.signin-mode .btn-auth span.signup-only { display: none !important; }
+    body.signin-mode .btn-auth span.signin-only { display: inline-block !important; }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 480px) {
       .auth-card {
@@ -418,11 +455,15 @@
 </head>
 <body>
 
-  <!-- BG EFFECTS -->
-  <div class="auth-bg">
-    <div class="bg-orb orb1"></div>
-    <div class="bg-orb orb2"></div>
-    <div class="bg-orb orb3"></div>
+  <!-- GLOBAL VIDEO BACKGROUND -->
+  <div class="hero-video-container">
+    <video id="bg-video-1" class="bg-video-el active" autoplay loop muted playsinline preload="auto">
+      <source src="bg-video.mp4" type="video/mp4">
+    </video>
+    <video id="bg-video-2" class="bg-video-el" autoplay loop muted playsinline preload="auto">
+      <source src="bg-video.mp4" type="video/mp4">
+    </video>
+    <div class="hero-video-overlay"></div>
   </div>
 
   <!-- AUTH CARD -->
@@ -504,8 +545,8 @@
 
       <!-- SUBMIT -->
       <button type="submit" class="btn-auth" id="btn-auth">
-        <span class="signup-only" style="display:contents;">Create Account</span>
-        <span class="signin-only" style="display:contents;">Sign In</span>
+        <span class="signup-only">Create Account</span>
+        <span class="signin-only">Sign In</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="signup-only"><path d="M15.5 7.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/><path d="M19.5 20.5c0-3.04-3.36-5.5-7.5-5.5s-7.5 2.46-7.5 5.5"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="signin-only"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
       </button>
@@ -709,5 +750,6 @@
     }
   </script>
   <script src="interactions.js"></script>
+  <script src="bg-video-loader.js"></script>
 </body>
 </html>

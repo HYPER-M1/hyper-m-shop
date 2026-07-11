@@ -1139,7 +1139,7 @@
 
       if (!contact || !utr) return;
 
-      // Auto-approved Order
+      // Pending Order Verification
       const orderData = {
         id: txnId,
         username: currentUser,
@@ -1150,7 +1150,7 @@
         method: currentPaymentMethod,
         utr: utr,
         date: new Date().toLocaleString(),
-        status: 'Approved' // Auto-approved!
+        status: 'Pending' // Set status to Pending for Admin Verification
       };
 
       // Push to orders list in localStorage
@@ -1158,40 +1158,20 @@
       orders.push(orderData);
       localStorage.setItem('orders', JSON.stringify(orders));
 
-      // Allocate or generate key
-      let keys = JSON.parse(localStorage.getItem('keys') || '[]');
-      const keyIdx = keys.findIndex(k => k.product === prodName && k.status === 'Unused');
-      
-      if (keyIdx !== -1) {
-        keys[keyIdx].status = 'Used';
-        keys[keyIdx].assignedTo = currentUser !== 'Guest' ? currentUser : contact;
-        keys[keyIdx].orderId = txnId;
-        keys[keyIdx].useDate = new Date().toLocaleDateString();
-        globallyAllocatedKey = keys[keyIdx].key;
+      // Customize success modal text to reflect pending review
+      const isWalletFunds = prodName.toUpperCase().includes('WALLET_FUNDS');
+      if (isWalletFunds) {
+        document.querySelector('.success-title').innerText = 'Funds Request Submitted';
+        document.querySelector('.success-desc').innerText = `Your transaction verification request (UTR: ${utr}) has been submitted. The admin will verify the payment and credit ₹${selectedDurationObj.price} to your wallet shortly.`;
+        globallyAllocatedKey = 'PENDING VERIFICATION';
       } else {
-        globallyAllocatedKey = generateRandomKey();
-        keys.push({
-          key: globallyAllocatedKey,
-          product: prodName,
-          duration: selectedDurationObj.name,
-          date: new Date().toLocaleDateString(),
-          status: 'Used',
-          assignedTo: currentUser !== 'Guest' ? currentUser : contact,
-          orderId: txnId,
-          useDate: new Date().toLocaleDateString()
-        });
+        document.querySelector('.success-title').innerText = 'Verification Submitted';
+        document.querySelector('.success-desc').innerText = `Your transaction verification request (UTR: ${utr}) has been submitted. The admin will verify the payment and activate your key shortly. Check your Dashboard 'My Keys' tab.`;
+        globallyAllocatedKey = 'PENDING VERIFICATION';
       }
-      localStorage.setItem('keys', JSON.stringify(keys));
 
-      // Increment keysClaimed count if user is registered
-      if (currentUser !== 'Guest') {
-        let users = JSON.parse(localStorage.getItem('users') || '[]');
-        const uIdx = users.findIndex(u => u.username === currentUser);
-        if (uIdx !== -1) {
-          users[uIdx].keysClaimed = (users[uIdx].keysClaimed || 0) + 1;
-          localStorage.setItem('users', JSON.stringify(users));
-        }
-      }
+      const copyBtn = document.getElementById('btn-copy-key-el');
+      if (copyBtn) copyBtn.style.display = 'none';
 
       // Populate key display val
       document.getElementById('generated-key-val').innerText = globallyAllocatedKey;

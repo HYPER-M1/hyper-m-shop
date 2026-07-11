@@ -1495,7 +1495,8 @@
           if (userIdx !== -1) {
             const matches = orders[idx].product.match(/\d+/);
             const amount = matches ? parseFloat(matches[0]) : 0;
-            users[userIdx].balance = (users[userIdx].balance || 0) + amount;
+            const currentBal = parseFloat(users[userIdx].balance) || 0;
+            users[userIdx].balance = currentBal + amount;
             localStorage.setItem('users', JSON.stringify(users));
             alert(`Order ${orderId} Approved!\nAdded ₹${amount} credit to user ${buyerUsername}.`);
           }

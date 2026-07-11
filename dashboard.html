@@ -549,7 +549,7 @@
           <button class="nav-btn" id="tab-wallet" onclick="switchTab('wallet')">💳 Wallet & Funds</button>
         </li>
         <li class="nav-item">
-          <button class="nav-btn" id="tab-giveaway" onclick="switchTab('giveaway')">🎁 Live Giveaway</button>
+          <button class="nav-btn" id="tab-mykeys" onclick="switchTab('mykeys')">🔑 My Keys</button>
         </li>
         <li class="nav-item">
           <button class="nav-btn" id="tab-refer" onclick="switchTab('refer')">👥 Refer & Earn</button>
@@ -558,15 +558,12 @@
           <button class="nav-btn" id="tab-mobile" onclick="switchTab('mobile')">🔍 Mobile Scanner</button>
         </li>
         <li class="nav-item">
-          <button class="nav-btn" id="tab-mykeys" onclick="switchTab('mykeys')">🔑 My Keys</button>
-        </li>
-        <li class="nav-item">
           <button class="nav-btn" id="tab-profile" onclick="switchTab('profile')">👤 Profile Settings</button>
         </li>
       </ul>
 
       <div class="sidebar-footer">
-        <button class="btn-logout-sidebar" onclick="logout()">LOGOUT</button>
+        <button class="btn-logout-sidebar" onclick="window.location.href='index.html'">BACK TO SHOP</button>
       </div>
     </aside>
 
@@ -675,27 +672,7 @@
           </div>
         </div>
 
-        <!-- ==================== TAB: GIVEAWAY ==================== -->
-        <div class="tab-content" id="content-giveaway">
-          <div class="panel-card">
-            <h3 class="panel-title">🎁 Live giveaways</h3>
-            <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 1.5rem;">
-              Join live giveaways for premium license keys. Winners are announced daily!
-            </p>
-            <div class="giveaway-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-              <div style="background: var(--bg3); border: 1px solid var(--border); padding: 1.2rem; border-radius: 8px;">
-                <h4 style="font-family: var(--font-sub); font-size: 1.15rem; margin-bottom: 0.5rem;">VALORANT CHEAT PRO (30 Days)</h4>
-                <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 1rem;">Total Entries: <strong style="color: var(--white);">248</strong> | Time Left: <strong style="color: var(--red);">4h 32m</strong></p>
-                <button onclick="joinGiveaway(this)" class="btn-red-pill" style="padding: 0.6rem;">JOIN GIVEAWAY</button>
-              </div>
-              <div style="background: var(--bg3); border: 1px solid var(--border); padding: 1.2rem; border-radius: 8px;">
-                <h4 style="font-family: var(--font-sub); font-size: 1.15rem; margin-bottom: 0.5rem;">HYPER X PHONE PANEL (Lifetime)</h4>
-                <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 1rem;">Total Entries: <strong style="color: var(--white);">581</strong> | Time Left: <strong style="color: var(--red);">12h 10m</strong></p>
-                <button onclick="joinGiveaway(this)" class="btn-red-pill" style="padding: 0.6rem;">JOIN GIVEAWAY</button>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         <!-- ==================== TAB: REFER ==================== -->
         <div class="tab-content" id="content-refer">
@@ -756,95 +733,53 @@
 
         <!-- ==================== TAB: PROFILE ==================== -->
         <div class="tab-content" id="content-profile">
-          <div class="card-grid-container">
-            <!-- Left Side Cards -->
-            <div>
-              <!-- Edit Persona -->
-              <div class="panel-card">
-                <h3 class="panel-title">Edit Persona</h3>
-                <form onsubmit="saveProfileSettings(event)">
-                  <div class="form-group">
-                    <label class="form-label">Profile Photo URL</label>
-                    <input type="text" id="profile-photo-url" class="form-input" placeholder="Direct Image link (jpg, png) or Google Photo URL.">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" id="profile-username" class="form-input" disabled>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Email Address (Primary)</label>
-                    <input type="email" id="profile-email" class="form-input" required>
-                    <p style="font-size: 0.72rem; color: var(--gray); margin-top: 0.35rem;">Email cannot be changed after registration.</p>
-                  </div>
-                  <button type="submit" class="btn-red-pill">Save Changes</button>
-                </form>
-              </div>
-
-              <!-- Google 2FA Security -->
-              <div class="panel-card">
-                <h3 class="panel-title" style="color: var(--green);">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.3rem;">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                  Google 2FA Security
-                </h3>
-                <p style="color: var(--gray); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.2rem;">
-                  Enhance your shield. Multi-factor authentication adds a second layer of security to your account.
-                </p>
-                <div class="two-factor-wrap" style="display: flex; gap: 1.5rem; align-items: center; background: var(--bg3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
-                  <!-- Mock QR code -->
-                  <div style="background: white; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=HYPERX-2FA-MOCK" style="width: 100px; height: 100px; display: block;" alt="2FA QR">
-                  </div>
-                  <div style="flex-grow: 1;">
-                    <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 0.4rem;">1. Scan QR with Auth App</p>
-                    <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 0.6rem;">2. Enter 6-digit verification code below:</p>
-                    <div style="display: flex; gap: 0.5rem; max-width: 300px;">
-                      <input type="text" placeholder="000000" class="form-input" style="padding: 0.6rem; text-align: center; font-family: monospace; letter-spacing: 2px;" maxlength="6">
-                      <button type="button" style="background: var(--red); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-family: var(--font-sub); font-weight: 700; cursor: pointer;" onclick="alert('Google 2FA Enabled Successfully!')">Enable</button>
-                    </div>
-                    <p style="font-size: 0.7rem; color: var(--gray); margin-top: 0.5rem; font-family: monospace;">Manual Key: RA6XOPT57SZRS4DD</p>
-                  </div>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px; margin: 0 auto;">
+            <!-- Edit Persona -->
+            <div class="panel-card" style="margin-bottom: 0;">
+              <h3 class="panel-title">Edit Persona</h3>
+              <form onsubmit="saveProfileSettings(event)">
+                <div class="form-group">
+                  <label class="form-label">Profile Photo URL</label>
+                  <input type="text" id="profile-photo-url" class="form-input" placeholder="Direct Image link (jpg, png) or Google Photo URL.">
                 </div>
-              </div>
+                <div class="form-group">
+                  <label class="form-label">Username</label>
+                  <input type="text" id="profile-username" class="form-input" disabled>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address (Primary)</label>
+                  <input type="email" id="profile-email" class="form-input" required>
+                  <p style="font-size: 0.72rem; color: var(--gray); margin-top: 0.35rem;">Email cannot be changed after registration.</p>
+                </div>
+                <button type="submit" class="btn-red-pill">Save Changes</button>
+              </form>
             </div>
 
-            <!-- Right Side Cards -->
-            <div>
-              <!-- Account DNA -->
-              <div class="info-card">
-                <h4 style="font-family: var(--font-sub); font-size: 1.1rem; color: var(--white); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;">🧬 Account DNA</h4>
-                <div class="info-row">
-                  <span class="info-label">Internal UID</span>
-                  <span class="info-value" id="dna-uid">#USER_GM</span>
+            <!-- Google 2FA Security -->
+            <div class="panel-card" style="margin-bottom: 0;">
+              <h3 class="panel-title" style="color: var(--green);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.3rem;">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Google 2FA Security
+              </h3>
+              <p style="color: var(--gray); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.2rem;">
+                Enhance your shield. Multi-factor authentication adds a second layer of security to your account.
+              </p>
+              <div class="two-factor-wrap" style="display: flex; gap: 1.5rem; align-items: center; background: var(--bg3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                <!-- Mock QR code -->
+                <div style="background: white; padding: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=HYPERX-2FA-MOCK" style="width: 100px; height: 100px; display: block;" alt="2FA QR">
                 </div>
-                <div class="info-row">
-                  <span class="info-label">Auth Provider</span>
-                  <span class="info-value">Platform Native</span>
-                </div>
-                <div class="info-row">
-                  <span class="info-label">Privilege Tier</span>
-                  <span class="info-value"><span class="badge-user">USER</span></span>
-                </div>
-                <div class="info-row">
-                  <span class="info-label">Last Login Trace</span>
-                  <span class="info-value">106.206.203.18</span>
-                </div>
-                <div class="info-row">
-                  <span class="info-label">Registry Date</span>
-                  <span class="info-value" id="dna-date">Jul 05, 2026</span>
-                </div>
-              </div>
-
-              <!-- Platform Loyalty -->
-              <div class="info-card" style="border-left: 3px solid #ffaa00;">
-                <h4 style="font-family: var(--font-sub); font-size: 1.1rem; color: #ffaa00; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;">Platform Loyalty</h4>
-                <p style="color: var(--gray); font-size: 0.8rem; line-height: 1.5; margin-bottom: 1rem;">
-                  Your account is in high standing. Increasing your spend tier unlocks exclusive beta access and lower gateway fees.
-                </p>
-                <div style="font-family: var(--font-sub); font-weight: 900; font-size: 0.95rem; color: #ffaa00; letter-spacing: 0.5px; text-transform: uppercase;">
-                  Bronze I PROTECTION ACTIVE
+                <div style="flex-grow: 1;">
+                  <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 0.4rem;">1. Scan QR with Auth App</p>
+                  <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 0.6rem;">2. Enter 6-digit verification code below:</p>
+                  <div style="display: flex; gap: 0.5rem; max-width: 300px;">
+                    <input type="text" placeholder="000000" class="form-input" style="padding: 0.6rem; text-align: center; font-family: monospace; letter-spacing: 2px;" maxlength="6">
+                    <button type="button" style="background: var(--red); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-family: var(--font-sub); font-weight: 700; cursor: pointer;" onclick="alert('Google 2FA Enabled Successfully!')">Enable</button>
+                  </div>
+                  <p style="font-size: 0.7rem; color: var(--gray); margin-top: 0.5rem; font-family: monospace;">Manual Key: RA6XOPT57SZRS4DD</p>
                 </div>
               </div>
             </div>
@@ -1030,25 +965,14 @@
         contact: currentUserData.email,
         utr: utr,
         duration: 'N/A',
-        status: 'Approved', // Auto-approved!
+        status: 'Pending', // Require Admin Verification
         date: new Date().toLocaleString(),
         username: currentUserData.username
       };
       orders.push(newOrder);
       localStorage.setItem('orders', JSON.stringify(orders));
-
-      // Add to balance immediately
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      const uIdx = users.findIndex(u => u.username === currentUserData.username);
-      if (uIdx !== -1) {
-        users[uIdx].balance = (users[uIdx].balance || 0) + amount;
-        localStorage.setItem('users', JSON.stringify(users));
-        // Update currentUserData
-        currentUserData.balance = users[uIdx].balance;
-        localStorage.setItem('currentUserData', JSON.stringify(currentUserData));
-      }
       
-      alert(`✅ ₹${amount} credit added successfully to your wallet!`);
+      alert(`✅ Request submitted successfully!\n\nUTR: ${utr}\nAmount: ₹${amount}\n\nThe admin will verify your payment details shortly and credit your wallet. You can check status in this dashboard.`);
       document.getElementById('wallet-form').reset();
       updateStatsUI();
       loadWalletInfo();
