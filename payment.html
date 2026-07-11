@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecurePay – Secure Checkout Gateway</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root {
+      --bg: #0F0F0F;
+      --panel-bg: #161616;
+      --text-main: #ffffff;
+      --text-sub: #A1A1AA;
+      --border: rgba(255, 255, 255, 0.08);
+      --blue: #E50914;
+      --blue-dark: #B20710;
+      --green: #10b981;
+      --green-bg: rgba(16, 185, 129, 0.1);
+      --topbar-bg: #0F0F0F;
+      --font: 'Inter', sans-serif;
+      --accent-grad: linear-gradient(135deg, #E50914 0%, #B20710 100%);
+    }
+
+    body.dark-mode {
+      --bg: #0F0F0F;
+      --panel-bg: #161616;
+      --text-main: #ffffff;
+      --text-sub: #A1A1AA;
+      --border: rgba(255, 255, 255, 0.08);
+      --topbar-bg: #0F0F0F;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: var(--font);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ===== TOP BAR ===== */
+    .top-capsule {
+      background: var(--topbar-bg);
+      border-radius: 50px;
+      width: 90%;
+      max-width: 960px;
+      margin: 1.5rem 0;
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-icon {
+      fill: var(--blue);
+      width: 20px;
+      height: 20px;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .mode-toggle {
+      background: none;
+      border: none;
+      color: #a0aec0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+
+    .mode-toggle:hover { color: white; }
+
+    /* ===== MAIN LAYOUT CONTAINER ===== */
+    .checkout-container {
+      width: 90%;
+      max-width: 960px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .checkout-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--panel-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ===== ORDER SUMMARY ===== */
+    .summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      font-size: 0.92rem;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .summary-item span { color: var(--text-sub); }
+    .summary-item strong { color: var(--text-main); font-weight: 600; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0.2rem 0;
+    }
+
+    /* ===== TOTAL PAYABLE ===== */
+    .total-payable {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      padding: 1rem 0;
+      border-top: 1px dashed var(--border);
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .total-price {
+      color: var(--text-main);
+    }
+
+    /* ===== DURATION SELECTOR ===== */
+    .duration-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .duration-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .dur-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.55rem 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dur-btn.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+      box-shadow: 0 4px 10px rgba(52,152,219,0.25);
+    }
+
+    /* ===== VERIFICATION FORM ===== */
+    .form-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .form-box-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.2rem;
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      color: var(--text-main);
+      font-family: var(--font);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--blue);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--blue);
+      border: none;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 0.2rem;
+    }
+
+    .btn-submit:hover {
+      background: var(--blue-dark);
+    }
+
+    /* ===== CONNECTION SECURITY ===== */
+    .security-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+
+    .security-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .security-header svg {
+      color: var(--blue);
+    }
+
+    .wave-canvas {
+      width: 100%;
+      height: 48px;
+      background: var(--bg);
+      border-radius: 6px;
+      display: block;
+    }
+
+    .security-desc {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    /* ===== RIGHT COLUMN CHECKOUT ===== */
+    .right-card {
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .right-header {
+      background: var(--blue);
+      color: white;
+      padding: 1.4rem;
+      text-align: center;
+    }
+
+    .merchant-logo-txt {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.15rem;
+      text-transform: uppercase;
+    }
+
+    .merchant-subtitle {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .right-body {
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.3rem;
+    }
+
+    .big-price {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .big-txn {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-top: -0.4rem;
+    }
+
+    /* ===== QR CODE ===== */
+    .qr-container {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      background: white;
+      width: 100%;
+      max-width: 220px;
+    }
+
+    .qr-img {
+      width: 160px;
+      height: 160px;
+      display: block;
+    }
+
+    .qr-label {
+      font-size: 0.72rem;
+      color: #718096;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* ===== PAYMENT APP ICONS ===== */
+    .pay-apps-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .pay-apps-label::before,
+    .pay-apps-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .apps-row {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .app-icon-btn {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: var(--panel-bg);
+      padding: 0.55rem;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .app-icon-btn:hover {
+      border-color: var(--blue);
+      background: var(--bg);
+      transform: translateY(-1px);
+    }
+
+    .app-icon-btn svg, .app-icon-btn img {
+      height: 16px;
+      object-fit: contain;
+    }
+
+    .app-icon-btn span {
+      font-size: 0.65rem;
+      color: var(--text-sub);
+      margin-top: 0.3rem;
+      font-weight: 500;
+    }
+
+    /* ===== FOOTER BAR ===== */
+    .right-footer {
+      border-top: 1px solid var(--border);
+      padding: 0.9rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      background: var(--bg);
+      margin-top: auto;
+      transition: background 0.3s;
+    }
+
+    .secured-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+    }
+
+    /* ===== STATUS LABELS ===== */
+    .green-badge {
+      background: var(--green-bg);
+      border: 1px solid rgba(46,204,113,0.3);
+      color: var(--green);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0 auto;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .green-badge svg { width: 14px; height: 14px; }
+
+    /* ===== SUCCESS MODAL ===== */
+    .success-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .success-modal-overlay.active {
+      display: flex;
+    }
+    .success-modal-box {
+      background: #1a1a24;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(46, 204, 113, 0.15), 0 20px 40px rgba(0,0,0,0.5);
+      animation: zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+      color: #ffffff;
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .success-icon-wrap {
+      width: 72px;
+      height: 72px;
+      background: rgba(46, 204, 113, 0.1);
+      border: 2px solid #2ecc71;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 0 20px rgba(46, 204, 113, 0.25);
+    }
+    .success-icon-wrap svg {
+      width: 36px;
+      height: 36px;
+      color: #2ecc71;
+    }
+    .success-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+    }
+    .success-desc {
+      font-size: 0.9rem;
+      color: #a0aec0;
+      line-height: 1.5;
+      margin-bottom: 1.8rem;
+    }
+    .key-display-box {
+      background: #111116;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .key-display-val {
+      font-family: monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2ecc71;
+      letter-spacing: 1px;
+      word-break: break-all;
+      text-align: left;
+    }
+    .btn-copy-key {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ffffff;
+      padding: 0.45rem 0.95rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-copy-key:hover {
+      background: #ffffff;
+      color: #1a1a24;
+    }
+    .btn-modal-cta {
+      width: 100%;
+      background: #2ecc71;
+      border: none;
+      color: #ffffff;
+      padding: 0.85rem;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-modal-cta:hover {
+      background: #27ae60;
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+    }
+  </style>
+</head>
+<body class="dark-mode">
+
+  <!-- TOP CAPSULE -->
+  <div class="top-capsule">
+    <div class="brand-wrap">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span class="brand-title">SecurePay</span>
+    </div>
+    <button class="mode-toggle" onclick="toggleDarkMode()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="checkout-container">
+
+    <!-- LEFT SIDE: BILLING SUMMARY & FORM -->
+    <div class="card">
+      <h3 class="card-title">Order Summary</h3>
+      
+      <div class="summary-list">
+        <div class="summary-item">
+          <span>Merchant</span>
+          <strong id="summary-merchant">HYPER X OFFICIAL</strong>
+        </div>
+        <div class="summary-item">
+          <span>Txn ID</span>
+          <strong id="summary-txn-id">-</strong>
+        </div>
+        <div class="summary-item">
+          <span>Product Name</span>
+          <strong id="summary-product-name">-</strong>
+        </div>
+      </div>
+
+      <!-- DURATION CONTROLLER -->
+      <div>
+        <div class="duration-title">Select Duration Option</div>
+        <div class="duration-grid" id="duration-selector-row">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="total-payable">
+        <span>Total Payable</span>
+        <span class="total-price" id="summary-total">₹0.00</span>
+      </div>
+
+      <!-- Secure connection status -->
+      <a href="#" class="green-badge" id="support-link" target="_blank">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        256-bit Secure Encryption
+      </a>
+
+      <!-- VERIFICATION FORM -->
+      <div class="form-box">
+        <h4 class="form-box-title">Complete Payment Verification</h4>
+        <form id="payment-submit-form" onsubmit="submitPayment(event)">
+          <div style="margin-bottom: 0.8rem;">
+            <input type="text" id="contact-input" placeholder="Your WhatsApp or Telegram Username" class="input-field" required>
+          </div>
+          <div style="margin-bottom: 0.8rem;">
+            <input type="text" id="utr-input" placeholder="Transaction Ref / UTR Number" class="input-field" required>
+          </div>
+          <button type="submit" class="btn-submit">SUBMIT & VERIFY</button>
+        </form>
+      </div>
+
+      <!-- CONNECTION SECURITY CHART -->
+      <div class="security-card">
+        <div class="security-header">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Connection Security</span>
+        </div>
+        <canvas class="wave-canvas" id="security-canvas"></canvas>
+        <p class="security-desc">256-bit AES encryption tunnel active</p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE: GATEWAY CHECKOUT CARD -->
+    <div class="card right-card">
+      <div class="right-header">
+        <h3 class="merchant-logo-txt">HYPER X OFFICIAL</h3>
+        <p class="merchant-subtitle">Secure Checkout</p>
+      </div>
+
+      <div class="right-body" style="padding:0;">
+        <!-- Payment Tabs Selection -->
+        <div class="payment-tabs-row" style="display:flex; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.02); margin-bottom:1.2rem;">
+          <div class="pay-tab active" id="tab-upi" onclick="switchPaymentTab('UPI')" style="flex:1; text-align:center; padding:0.75rem 0.5rem; font-family:var(--font); font-size:0.75rem; font-weight:700; cursor:pointer; color:var(--white); border-bottom:2px solid var(--blue); text-transform:uppercase; letter-spacing:0.5px;">UPI QR</div>
+          <div class="pay-tab" id="tab-razorpay" onclick="switchPaymentTab('RAZORPAY')" style="flex:1; text-align:center; padding:0.75rem 0.5rem; font-family:var(--font); font-size:0.75rem; font-weight:700; cursor:pointer; color:var(--text-sub); border-bottom:2px solid transparent; text-transform:uppercase; letter-spacing:0.5px;">RAZORPAY (Cards/UPI)</div>
+          <div class="pay-tab" id="tab-usdt" onclick="switchPaymentTab('USDT')" style="flex:1; text-align:center; padding:0.75rem 0.5rem; font-family:var(--font); font-size:0.75rem; font-weight:700; cursor:pointer; color:var(--text-sub); border-bottom:2px solid transparent; text-transform:uppercase; letter-spacing:0.5px;">USDT (TRC-20)</div>
+        </div>
+
+        <div style="padding:0 1.5rem 1.5rem 1.5rem;">
+          <div class="big-price" id="checkout-price">₹0.00</div>
+          <div class="big-txn" id="checkout-txn-id" style="margin-bottom:1.2rem;">Txn ID: -</div>
+
+          <!-- 1. UPI Area -->
+          <div id="payment-area-upi">
+            <!-- Dynamic QR Code Card -->
+            <div class="qr-container">
+              <img src="" id="checkout-qr-img" class="qr-img" alt="UPI Payment QR">
+              <p class="qr-label">Scan QR with any UPI app</p>
+            </div>
+
+            <div class="pay-apps-label">Or Pay Using Apps</div>
+
+            <!-- payment app buttons -->
+            <div class="apps-row">
+              <div class="app-icon-btn" onclick="openApp('Paytm')">
+                <span style="font-weight: 700; color: #002e6e; font-size: 0.85rem; font-style: italic;">paytm</span>
+                <span>Paytm</span>
+              </div>
+              <div class="app-icon-btn" onclick="openApp('PhonePe')">
+                <span style="font-weight: 700; color: #5f259f; font-size: 0.85rem;">PhonePe</span>
+                <span>PhonePe</span>
+              </div>
+              <div class="app-icon-btn" onclick="openApp('Google Pay')">
+                <span style="font-weight: 700; color: #4285f4; font-size: 0.85rem;">GPay</span>
+                <span>GPay</span>
+              </div>
+              <div class="app-icon-btn" onclick="openApp('Other')">
+                <span style="font-weight: 700; color: #2d3748; font-size: 1rem;">+</span>
+                <span>Other</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. USDT Area -->
+          <div id="payment-area-usdt" style="display:none;">
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:1.2rem; text-align:center; margin-bottom:1.2rem;">
+              <p style="font-size:0.8rem; color:var(--text-sub); margin-bottom:0.8rem;">Send USDT (TRC-20) to address below:</p>
+              <img src="" id="checkout-usdt-qr" style="width:140px; height:140px; margin:0 auto 0.8rem; display:block; border-radius:6px; border: 1px solid var(--border);">
+              <div style="background:#111116; border:1px solid var(--border); padding:0.6rem; border-radius:6px; font-family:monospace; font-size:0.75rem; color:var(--white); word-break:break-all; margin-bottom:0.8rem; text-align:center; font-weight:700;" id="checkout-usdt-address">Not Configured</div>
+              <button onclick="copyTextToClipboard(document.getElementById('checkout-usdt-address').innerText)" type="button" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:white; padding:0.45rem 1rem; border-radius:6px; font-size:0.75rem; font-weight:700; cursor:pointer;">Copy Address</button>
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-sub); line-height:1.45; text-align:center;">
+              ⚠️ Please send only **USDT TRC-20**. Sending other tokens will result in loss. Price converted at rate of 1 USD = 83 INR.
+            </div>
+          </div>
+
+          <!-- 3. Razorpay Area -->
+          <div id="payment-area-razorpay" style="display:none; text-align:center;">
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:1.8rem; text-align:center; margin-bottom:1.2rem;">
+              <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+                <svg width="120" height="32" viewBox="0 0 167 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M72.072 26.696c-1.392 0-2.483-.435-3.272-1.306-.79-.87-1.185-2.062-1.185-3.576v-6.732h2.957v6.62c0 .762.193 1.343.58 1.745.385.401.956.602 1.713.602.83 0 1.455-.226 1.874-.678.42-.451.63-1.077.63-1.877v-6.412h2.956v11.615h-2.956v-1.63c-.808 1.258-2.002 1.887-3.582 1.887zm18.358 0c-1.815 0-3.32-.619-4.516-1.857-1.196-1.238-1.794-2.883-1.794-4.936v-.55c0-2.07.611-3.717 1.834-4.945 1.223-1.228 2.766-1.842 4.629-1.842 1.792 0 3.254.58 4.387 1.742 1.133 1.162 1.699 2.753 1.699 4.77v1.768H88.75c.084.974.407 1.733.97 2.277.563.544 1.282.816 2.158.816 1.385 0 2.457-.542 3.218-1.626h3.144c-.454 1.353-1.328 2.404-2.62 3.155-1.293.75-2.85 1.127-4.673 1.127zm-.082-11.45c-.83 0-1.488.256-1.973.768-.485.512-.767 1.218-.846 2.119h5.586v-.277c0-.853-.223-1.503-.668-1.95a2.222 2.222 0 0 0-1.713-.66zm13.123 11.45V15.08h2.957v1.65c.783-1.272 1.942-1.908 3.479-1.908.453 0 .825.044 1.116.133v2.853c-.39-.142-.876-.213-1.458-.213-1.026 0-1.802.327-2.329.982-.527.655-.79 1.583-.79 2.784v5.335h-2.975zM11.365 42.417h-2.95c-.322 0-.585-.262-.585-.584V20.155c0-.323.263-.585.585-.585h2.95c.323 0 .585.262.585.585v21.678c0 .322-.262.584-.585.584zm4.492-3.147h-1.543c-.323 0-.585-.262-.585-.584v-9.52c0-.322.262-.584.585-.584h1.543c.323 0 .585.262.585.584v9.52c0 .322-.262.584-.585.584z" fill="#00c0f2"/>
+                  <path d="M21.282.805L.82 28.608c-.463.63-.013 1.517.765 1.517h23.216c.552 0 .918-.553.714-1.066L15.962 5.1c-.244-.613-1.114-.613-1.358 0L9.932 16.89c-.198.497.168 1.036.705 1.036h6.147c.553 0 .919-.553.714-1.066l-2.614-6.58" fill="#fff"/>
+                </svg>
+              </div>
+              <p style="font-size:0.88rem; color:var(--white); font-weight:600; margin-bottom:1rem;">Pay instantly via Razorpay Checkout</p>
+              <p style="font-size:0.75rem; color:var(--text-sub); margin-bottom:1.5rem; line-height:1.5;">Cards, UPI (GPay, PhonePe, Paytm), Netbanking, and Wallets are supported. Delivery is 100% automated.</p>
+              
+              <button onclick="payWithRazorpay()" type="button" class="btn-submit" style="background:#00c0f2; border:none; box-shadow:0 4px 15px rgba(0,192,242,0.3); font-weight:700; padding:0.9rem 1.8rem; border-radius:50px;">
+                💳 LAUNCH RAZORPAY CHECKOUT
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer indicator -->
+      <div class="right-footer">
+        <div class="secured-tag">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="12 22 4 12 12 2 20 12"/></svg>
+          Secured by UPI
+        </div>
+        <div class="timer-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="countdown-timer">05:00</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SUCCESS MODAL OVERLAY -->
+  <div class="success-modal-overlay" id="success-modal">
+    <div class="success-modal-box">
+      <div class="success-icon-wrap">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h3 class="success-title">Payment Approved</h3>
+      <p class="success-desc">Your transaction was verified automatically. Your license key has been generated and activated successfully!</p>
+      
+      <div class="key-display-box">
+        <span class="key-display-val" id="generated-key-val">HYPER-KEY-GENERATING...</span>
+        <button class="btn-copy-key" id="btn-copy-key-el" onclick="copyGeneratedKey()">Copy Key</button>
+      </div>
+      
+      <button class="btn-modal-cta" onclick="finishPaymentCheckout()">GO TO DASHBOARD</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== AUTH GUARD =====
+    const currentUser = localStorage.getItem('currentUser') || 'Guest';
+    if (currentUser === 'Guest') {
+      window.location.href = 'auth.html?mode=signin';
+    }
+
+    // ===== URL PARAMETERS =====
+    const urlParams = new URLSearchParams(window.location.search);
+    const prodName = urlParams.get('product') || 'Premium Key Purchase';
+    const basePrice = parseFloat(urlParams.get('price')) || 0;
+    const durRaw = urlParams.get('durations') || '';
+    const selectedDur = urlParams.get('selected') || '';
+
+    // ===== STATE VARIABLES =====
+    let txnId = '';
+    let parsedDurations = [];
+    let selectedDurationObj = null;
+
+    // Load configurations
+    const settings = JSON.parse(localStorage.getItem('paymentSettings')) || {
+      upiId: 'hyper-m-shop@ybl',
+      cryptoAddress: 'TYuG8Jp99XhsaEw1R4aN5bS3mK9q8wRt4z',
+      razorpayKey: '',
+      whatsapp: '+919999999999'
+    };
+
+    // Load initial addresses info
+    document.getElementById('checkout-usdt-address').innerText = settings.cryptoAddress || 'Not Configured';
+    document.getElementById('checkout-usdt-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(settings.cryptoAddress || '')}`;
+
+    // Dark Mode management
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('paymentDarkMode', isDark ? 'true' : 'false');
+    }
+    // Restore mode
+    if (localStorage.getItem('paymentDarkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+
+    // Set support link to whatsapp Support
+    const supportLink = document.getElementById('support-link');
+    if (supportLink && settings.whatsapp) {
+      // Clean number
+      const num = settings.whatsapp.replace(/\+/g, '').replace(/\s/g, '');
+      supportLink.href = `https://wa.me/${num}`;
+    }
+
+    // Generate Transaction ID
+    function generateTxnId() {
+      const chars = '0123456789';
+      let r = '';
+      for(let i=0; i<8; i++) r += chars[Math.floor(Math.random() * chars.length)];
+      return 'TXNHY' + r;
+    }
+    txnId = generateTxnId();
+
+    // Populate transaction IDs
+    document.getElementById('summary-txn-id').innerText = txnId;
+    document.getElementById('checkout-txn-id').innerText = `Txn ID: ${txnId}`;
+    document.getElementById('summary-product-name').innerText = prodName;
+
+    // Parse durations configurations
+    let rawDurations = ['1 Day', '7 Days', '30 Days', 'Lifetime'];
+    if (durRaw) {
+      try { rawDurations = JSON.parse(decodeURIComponent(durRaw)); } catch(e){}
+    }
+
+    parsedDurations = rawDurations.map((item, i) => {
+      if (item.includes('=')) {
+        const parts = item.split('=');
+        return { raw: item, name: parts[0].trim(), price: parseFloat(parts[1].trim()) || 0 };
+      } else if (item.includes(':')) {
+        const parts = item.split(':');
+        return { raw: item, name: parts[0].trim(), price: parseFloat(parts[1].trim()) || 0 };
+      } else {
+        return { raw: item, name: item.trim(), price: basePrice + i * Math.round(basePrice * 0.45) };
+      }
+    });
+
+    // Populate Selector Row
+    const selRow = document.getElementById('duration-selector-row');
+    if (selRow) {
+      selRow.innerHTML = parsedDurations.map((d, i) => `
+        <button class="dur-btn" data-raw="${d.raw}" onclick="selectDuration('${d.raw}')">${d.name}</button>
+      `).join('');
+    }
+
+    // Select duration handler
+    function selectDuration(rawVal) {
+      document.querySelectorAll('.dur-btn').forEach(b => {
+        if (b.getAttribute('data-raw') === rawVal) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+
+      selectedDurationObj = parsedDurations.find(d => d.raw === rawVal) || parsedDurations[0];
+
+      // Update UI elements based on active payment tab
+      updateGatewayPricingDisplay();
+
+      // Update UPI QR Code
+      const upiData = `upi://pay?pa=${settings.upiId}&pn=HYPER X&am=${selectedDurationObj.price}&cu=INR&tn=${encodeURIComponent(prodName + ' - ' + selectedDurationObj.name)}`;
+      const qrEl = document.getElementById('checkout-qr-img');
+      if (qrEl) {
+        qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiData)}`;
+      }
+    }
+
+    // Dynamic payment tabs system
+    let currentPaymentMethod = 'UPI';
+
+    function switchPaymentTab(method) {
+      currentPaymentMethod = method;
+      
+      document.querySelectorAll('.pay-tab').forEach(t => {
+        t.classList.remove('active');
+        t.style.color = 'var(--text-sub)';
+        t.style.borderBottomColor = 'transparent';
+      });
+      
+      const activeTab = document.getElementById(`tab-${method.toLowerCase()}`);
+      if (activeTab) {
+        activeTab.classList.add('active');
+        activeTab.style.color = 'var(--white)';
+        activeTab.style.borderBottomColor = 'var(--blue)';
+      }
+      
+      document.getElementById('payment-area-upi').style.display = 'none';
+      document.getElementById('payment-area-usdt').style.display = 'none';
+      document.getElementById('payment-area-razorpay').style.display = 'none';
+      document.getElementById(`payment-area-${method.toLowerCase()}`).style.display = 'block';
+      
+      const utrInput = document.getElementById('utr-input');
+      const methodLabel = document.querySelector('.secured-tag');
+
+      if (method === 'UPI') {
+        utrInput.placeholder = 'Transaction Ref / UTR Number';
+        if (methodLabel) methodLabel.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="12 22 4 12 12 2 20 12"/></svg>
+          Secured by UPI`;
+      } else if (method === 'USDT') {
+        utrInput.placeholder = 'Transaction Hash / TXID';
+        if (methodLabel) methodLabel.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          Secured by TRC-20`;
+      } else if (method === 'RAZORPAY') {
+        utrInput.placeholder = 'Auto Verified via Razorpay';
+        if (methodLabel) methodLabel.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+          Secured by Razorpay`;
+      }
+      updateGatewayPricingDisplay();
+    }
+
+    function updateGatewayPricingDisplay() {
+      if (!selectedDurationObj) return;
+      const priceVal = selectedDurationObj.price;
+      const summaryTotal = document.getElementById('summary-total');
+      const checkoutPrice = document.getElementById('checkout-price');
+
+      if (currentPaymentMethod === 'UPI') {
+        summaryTotal.innerText = `₹${priceVal}.00`;
+        checkoutPrice.innerText = `₹${priceVal}.00`;
+      } else if (currentPaymentMethod === 'USDT') {
+        const usdPrice = (priceVal / 83).toFixed(2);
+        summaryTotal.innerText = `$${usdPrice} USDT`;
+        checkoutPrice.innerText = `$${usdPrice} USDT`;
+      } else if (currentPaymentMethod === 'RAZORPAY') {
+        summaryTotal.innerText = `₹${priceVal}.00`;
+        checkoutPrice.innerText = `₹${priceVal}.00`;
+      }
+    }
+
+    function payWithRazorpay() {
+      if (!selectedDurationObj) {
+        alert("Please select a product duration first.");
+        return;
+      }
+      
+      const rzpKey = settings.razorpayKey || 'rzp_test_t1jX5P9m5L4wQ2'; // test key fallback
+      const amtInPaise = Math.round(selectedDurationObj.price * 100);
+      const currentUser = localStorage.getItem('currentUser') || 'Guest';
+
+      const options = {
+        "key": rzpKey,
+        "amount": amtInPaise,
+        "currency": "INR",
+        "name": "HYPER X OFFICIAL",
+        "description": `${prodName} - ${selectedDurationObj.name}`,
+        "image": "https://cdn-icons-png.flaticon.com/512/3408/3408474.png",
+        "handler": function (response) {
+          const rzpPaymentId = response.razorpay_payment_id;
+          alert("🎉 Payment Success via Razorpay! Payment ID: " + rzpPaymentId);
+          
+          const orderData = {
+            id: txnId,
+            username: currentUser,
+            contact: currentUser !== 'Guest' ? currentUser : 'razorpay_user',
+            product: prodName,
+            duration: selectedDurationObj.name,
+            price: `₹${selectedDurationObj.price}`,
+            method: 'RAZORPAY',
+            utr: rzpPaymentId,
+            date: new Date().toLocaleString(),
+            status: 'Approved'
+          };
+
+          let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+          orders.push(orderData);
+          localStorage.setItem('orders', JSON.stringify(orders));
+
+          let keys = JSON.parse(localStorage.getItem('keys') || '[]');
+          const keyIdx = keys.findIndex(k => k.product === prodName && k.status === 'Unused');
+          
+          if (keyIdx !== -1) {
+            keys[keyIdx].status = 'Used';
+            keys[keyIdx].assignedTo = currentUser !== 'Guest' ? currentUser : 'razorpay_user';
+            keys[keyIdx].orderId = txnId;
+            keys[keyIdx].useDate = new Date().toLocaleDateString();
+            globallyAllocatedKey = keys[keyIdx].key;
+          } else {
+            globallyAllocatedKey = generateRandomKey();
+            keys.push({
+              key: globallyAllocatedKey,
+              product: prodName,
+              duration: selectedDurationObj.name,
+              date: new Date().toLocaleDateString(),
+              status: 'Used',
+              assignedTo: currentUser !== 'Guest' ? currentUser : 'razorpay_user',
+              orderId: txnId,
+              useDate: new Date().toLocaleDateString()
+            });
+          }
+          localStorage.setItem('keys', JSON.stringify(keys));
+
+          document.getElementById('generated-key-val').innerText = globallyAllocatedKey;
+          document.getElementById('success-modal').classList.add('active');
+        },
+        "prefill": {
+          "name": currentUser !== 'Guest' ? currentUser : '',
+          "email": `${currentUser.toLowerCase()}@hyperx.com`,
+          "contact": ""
+        },
+        "theme": {
+          "color": "#ff0033"
+        }
+      };
+
+      try {
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } catch (err) {
+        alert("Razorpay Checkout failed to open: " + err.message + "\nMake sure you entered a valid Razorpay Key ID in the Admin Panel.");
+      }
+    }
+
+    function copyTextToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+      });
+    }
+
+    // Default select
+    const targetSel = parsedDurations.some(d => d.raw === selectedDur) ? selectedDur : parsedDurations[0].raw;
+    selectDuration(targetSel);
+
+    // APP INTERACTION SIMULATOR
+    function openApp(appName) {
+      alert(`SecurePay is requesting to open ${appName} with transaction details...\nIf on phone, this will launch the UPI app directly.`);
+    }
+
+    // COUNTDOWN TIMER
+    let totalSecs = 300; // 5 mins
+    const timerSpan = document.getElementById('countdown-timer');
+    const timerInterval = setInterval(() => {
+      totalSecs--;
+      if (totalSecs <= 0) {
+        clearInterval(timerInterval);
+        timerSpan.innerText = "00:00";
+        alert("Transaction expired! Please refresh to generate a new QR.");
+      } else {
+        const mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
+        const secs = (totalSecs % 60).toString().padStart(2, '0');
+        timerSpan.innerText = `${mins}:${secs}`;
+      }
+    }, 1000);
+
+    // SECURE WAVE ANIMATION (CANVAS)
+    const canvas = document.getElementById('security-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+      canvas.height = 48 * window.devicePixelRatio;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let offset = 0;
+    function drawWave() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#ff0033';
+      ctx.lineWidth = 2.5 * window.devicePixelRatio;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+
+      const midY = canvas.height / 2;
+      const amplitude = 8 * window.devicePixelRatio;
+      const frequency = 0.015;
+
+      for (let x = 0; x < canvas.width; x++) {
+        const y = midY + Math.sin(x * frequency + offset) * amplitude;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+      offset += 0.065;
+      requestAnimationFrame(drawWave);
+    }
+    drawWave();
+
+    // Key Generation Helper
+    function generateRandomKey() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let r = '';
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) r += chars[Math.floor(Math.random() * chars.length)];
+        if (i < 3) r += '-';
+      }
+      return 'HYPER-' + r;
+    }
+
+    let globallyAllocatedKey = '';
+
+    // SUBMIT PAYMENT FOR APPROVAL
+    function submitPayment(e) {
+      e.preventDefault();
+      const contact = document.getElementById('contact-input').value.trim();
+      const utr = document.getElementById('utr-input').value.trim();
+      const currentUser = localStorage.getItem('currentUser') || 'Guest';
+
+      if (!contact || !utr) return;
+
+      // Auto-approved Order
+      const orderData = {
+        id: txnId,
+        username: currentUser,
+        contact: contact,
+        product: prodName,
+        duration: selectedDurationObj.name,
+        price: currentPaymentMethod === 'USDT' ? `$${(selectedDurationObj.price / 83).toFixed(2)} USDT` : `₹${selectedDurationObj.price}`,
+        method: currentPaymentMethod,
+        utr: utr,
+        date: new Date().toLocaleString(),
+        status: 'Approved' // Auto-approved!
+      };
+
+      // Push to orders list in localStorage
+      let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+      orders.push(orderData);
+      localStorage.setItem('orders', JSON.stringify(orders));
+
+      // Allocate or generate key
+      let keys = JSON.parse(localStorage.getItem('keys') || '[]');
+      const keyIdx = keys.findIndex(k => k.product === prodName && k.status === 'Unused');
+      
+      if (keyIdx !== -1) {
+        keys[keyIdx].status = 'Used';
+        keys[keyIdx].assignedTo = currentUser !== 'Guest' ? currentUser : contact;
+        keys[keyIdx].orderId = txnId;
+        keys[keyIdx].useDate = new Date().toLocaleDateString();
+        globallyAllocatedKey = keys[keyIdx].key;
+      } else {
+        globallyAllocatedKey = generateRandomKey();
+        keys.push({
+          key: globallyAllocatedKey,
+          product: prodName,
+          duration: selectedDurationObj.name,
+          date: new Date().toLocaleDateString(),
+          status: 'Used',
+          assignedTo: currentUser !== 'Guest' ? currentUser : contact,
+          orderId: txnId,
+          useDate: new Date().toLocaleDateString()
+        });
+      }
+      localStorage.setItem('keys', JSON.stringify(keys));
+
+      // Increment keysClaimed count if user is registered
+      if (currentUser !== 'Guest') {
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        const uIdx = users.findIndex(u => u.username === currentUser);
+        if (uIdx !== -1) {
+          users[uIdx].keysClaimed = (users[uIdx].keysClaimed || 0) + 1;
+          localStorage.setItem('users', JSON.stringify(users));
+        }
+      }
+
+      // Populate key display val
+      document.getElementById('generated-key-val').innerText = globallyAllocatedKey;
+
+      // Show Success Modal
+      document.getElementById('success-modal').classList.add('active');
+    }
+
+    // COPY KEY FUNCTION
+    function copyGeneratedKey() {
+      if (!globallyAllocatedKey) return;
+      navigator.clipboard.writeText(globallyAllocatedKey).then(() => {
+        const btn = document.getElementById('btn-copy-key-el');
+        btn.innerText = 'Copied!';
+        btn.style.background = '#2ecc71';
+        btn.style.borderColor = '#2ecc71';
+        setTimeout(() => {
+          btn.innerText = 'Copy Key';
+          btn.style.background = '';
+          btn.style.borderColor = '';
+        }, 1500);
+      });
+    }
+
+    // CLOSE CHECKOUT FLOW
+    function finishPaymentCheckout() {
+      const currentUser = localStorage.getItem('currentUser') || 'Guest';
+      if (currentUser !== 'Guest') {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+  <script src="interactions.js"></script>
+</body>
+</html>

@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HYPER X – Owner Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #E50914;
+      --red-dark: #B20710;
+      --red-glow: rgba(229, 9, 20, 0.15);
+      --bg: #0F0F0F;
+      --bg2: #161616;
+      --bg3: #1A1A1A;
+      --card: #1A1A1A;
+      --border: rgba(255, 255, 255, 0.08);
+      --border2: rgba(255, 255, 255, 0.05);
+      --white: #ffffff;
+      --gray: #A1A1AA;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --font: 'Inter', sans-serif;
+      --font-sub: 'Inter', sans-serif;
+      --accent-grad: linear-gradient(135deg, #E50914 0%, #B20710 100%);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== LOGIN PAGE ===== */
+    #login-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,0,51,0.15) 0%, transparent 70%);
+    }
+
+    .login-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 0 60px rgba(255,0,51,0.15), 0 24px 48px rgba(0,0,0,0.6);
+    }
+
+    .login-brand {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.6rem; margin-bottom: 0.5rem;
+    }
+
+    .login-brand-text {
+      font-family: var(--font-sub); font-weight: 900; font-size: 1.8rem;
+      letter-spacing: 2px; color: var(--white);
+    }
+
+    .login-brand-text span { color: var(--red); }
+
+    .login-subtitle {
+      text-align: center;
+      font-family: var(--font-sub); font-weight: 700; font-size: 0.7rem;
+      letter-spacing: 3px; color: var(--gray); margin-bottom: 2.5rem;
+      text-transform: uppercase;
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      color: var(--white);
+      outline: none;
+      font-size: 0.95rem;
+      font-family: var(--font);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    .input-field:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255,0,51,0.1);
+    }
+
+    .btn-login {
+      width: 100%;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      padding: 1rem;
+      border-radius: 10px;
+      font-family: var(--font-sub);
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(255,0,51,0.35);
+    }
+
+    .btn-login:hover {
+      background: var(--red-dark);
+      box-shadow: 0 6px 30px rgba(255,0,51,0.55);
+      transform: translateY(-1px);
+    }
+
+    /* ===== DASHBOARD PAGE ===== */
+    #dashboard-page {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .dash-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 0.75rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0 0.5rem 1.5rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar-logo svg { filter: drop-shadow(0 0 8px rgba(255,0,51,0.8)); }
+
+    .sidebar-brand-name {
+      display: flex; flex-direction: column;
+    }
+
+    .sidebar-brand-name strong {
+      font-family: var(--font-sub);
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: 1.5px;
+      line-height: 1;
+    }
+
+    .sidebar-brand-name strong span { color: var(--red); }
+
+    .sidebar-brand-name small {
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.6rem;
+      letter-spacing: 2.5px;
+      color: var(--gray);
+      text-transform: uppercase;
+    }
+
+    .nav-group-label {
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      color: var(--gray);
+      text-transform: uppercase;
+      padding: 0 0.75rem;
+      margin: 0.5rem 0 0.4rem;
+    }
+
+    .nav-items { display: flex; flex-direction: column; gap: 0.2rem; flex-grow: 1; }
+
+    .tab-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--gray);
+      padding: 0.72rem 0.9rem;
+      text-align: left;
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.98rem;
+      letter-spacing: 0.3px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--white);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--red), #990022);
+      color: var(--white);
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(255,0,51,0.3);
+    }
+
+    .tab-btn .nav-icon {
+      width: 18px; height: 18px;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .tab-btn.active .nav-icon { opacity: 1; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--red);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-family: var(--font-sub);
+    }
+
+    .sidebar-footer {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-back-shop {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-back-shop:hover {
+      background: rgba(255,0,51,0.1);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-area {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      background: rgba(14,14,22,0.96);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    #top-bar-title {
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover { background: var(--red); color: var(--white); }
+
+    .content-area { padding: 2rem; flex-grow: 1; }
+
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== COMMON COMPONENTS ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: var(--red);
+    }
+
+    .stat-label {
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: var(--gray);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-val {
+      font-family: var(--font-sub);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--white);
+    }
+
+    .stat-sub {
+      font-size: 0.72rem;
+      color: var(--gray);
+      margin-top: 0.3rem;
+    }
+
+    .section-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .section-title {
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.5px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    th {
+      color: var(--gray);
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    tr:hover td { background: rgba(255,255,255,0.01); }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.72rem;
+      font-family: var(--font-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-pending { background: rgba(122,110,26,0.3); color: #ffeb5f; border: 1px solid rgba(255,235,95,0.25); }
+    .badge-approved { background: rgba(26,122,58,0.3); color: #5fff8e; border: 1px solid rgba(95,255,142,0.25); }
+    .badge-rejected { background: rgba(122,26,26,0.3); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.25); }
+    .badge-unused { background: rgba(26,122,58,0.3); color: #5fff8e; border: 1px solid rgba(95,255,142,0.25); }
+    .badge-used { background: rgba(80,80,80,0.3); color: #9999aa; border: 1px solid rgba(150,150,170,0.2); }
+    .badge-active { background: rgba(26,122,58,0.3); color: #5fff8e; border: 1px solid rgba(95,255,142,0.25); }
+    .badge-reseller { background: rgba(100,60,200,0.3); color: #b388ff; border: 1px solid rgba(179,136,255,0.3); }
+
+    .btn-action {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 0.3rem 0.65rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.78rem;
+      transition: all 0.15s;
+      margin-right: 4px;
+    }
+
+    .btn-action.approve:hover { background: rgba(26,122,58,0.6); border-color: #5fff8e; color: #5fff8e; }
+    .btn-action.reject:hover { background: rgba(122,26,26,0.6); border-color: #ff6b6b; color: #ff6b6b; }
+    .btn-action.edit:hover { background: rgba(255,0,51,0.2); border-color: var(--red); color: var(--red); }
+    .btn-action.copy:hover { background: rgba(100,100,255,0.2); border-color: #8899ff; color: #8899ff; }
+
+    .btn-red {
+      background: var(--red);
+      border: none;
+      color: var(--white);
+      padding: 0.7rem 1.4rem;
+      border-radius: 8px;
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-red:hover {
+      background: var(--red-dark);
+      box-shadow: 0 0 15px rgba(255,0,51,0.4);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .form-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .form-col label {
+      font-family: var(--font-sub);
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--gray);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-sm {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      color: var(--white);
+      outline: none;
+      font-size: 0.9rem;
+      font-family: var(--font);
+      transition: border-color 0.2s;
+    }
+
+    .input-sm:focus { border-color: var(--red); }
+
+    textarea.input-sm { resize: vertical; min-height: 80px; }
+
+    select.input-sm option { background: var(--bg3); }
+
+    /* ===== ACTIVITY FEED ===== */
+    .activity-feed { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .activity-item {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 0.8rem 1.1rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+
+    .activity-item .act-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 0.7rem;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    .activity-item .act-dot.warn { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+    .activity-item .act-dot.error { background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+    /* ===== TERMINAL ===== */
+    .log-terminal {
+      background: #040406;
+      border: 1px solid #1f1f2e;
+      border-radius: 8px;
+      padding: 1.2rem;
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: #39ff14;
+      min-height: 300px;
+      max-height: 500px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 15px rgba(0,255,0,0.08);
+      line-height: 1.6;
+    }
+
+    .log-line { margin-bottom: 0.2rem; }
+    .log-line.info { color: #39ff14; }
+    .log-line.warn { color: #ffcc44; }
+    .log-line.error { color: #ff5555; }
+    .log-line.system { color: #6699ff; }
+
+    /* ===== COUPON CARD ===== */
+    .coupon-card {
+      background: var(--bg3);
+      border: 1px dashed rgba(255,0,51,0.3);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .coupon-code {
+      font-family: monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--red);
+      letter-spacing: 2px;
+    }
+
+    /* ===== ANNOUNCEMENT CARD ===== */
+    .announcement-card {
+      background: var(--bg3);
+      border-left: 3px solid var(--red);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    /* ===== ACTIVITY MONITOR ===== */
+    .monitor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .monitor-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+
+    .monitor-val {
+      font-family: var(--font-sub);
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin-bottom: 0.3rem;
+    }
+
+    .monitor-label {
+      font-family: var(--font-sub);
+      font-size: 0.78rem;
+      color: var(--gray);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pulse {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+      margin-right: 0.4rem;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
+      50% { opacity: 0.5; box-shadow: 0 0 3px var(--green); }
+    }
+
+    /* ===== PROFIT CHART ===== */
+    .chart-bar-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+      height: 140px;
+      padding: 0.5rem 0;
+    }
+
+    .chart-bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 0.3rem; }
+
+    .chart-bar {
+      background: linear-gradient(to top, var(--red), rgba(255,0,51,0.4));
+      border-radius: 4px 4px 0 0;
+      width: 100%;
+      transition: all 0.3s;
+    }
+
+    .chart-bar-label { font-size: 0.65rem; color: var(--gray); font-family: var(--font-sub); font-weight: 700; }
+
+    /* ===== MOBILE RESPONSIVE ===== */
+    @media (max-width: 990px) {
+      .dash-layout {
+        grid-template-columns: 1fr !important;
+      }
+      .sidebar {
+        position: relative !important;
+        height: auto !important;
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+        padding: 0.6rem !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        scrollbar-width: none !important;
+      }
+      .sidebar::-webkit-scrollbar {
+        display: none !important;
+      }
+      .sidebar-brand {
+        display: none !important;
+      }
+      .nav-items {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 0.4rem !important;
+        margin-bottom: 0 !important;
+        flex-grow: unset !important;
+        width: 100% !important;
+      }
+      .nav-btn {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.76rem !important;
+        white-space: nowrap !important;
+      }
+      .nav-group-label {
+        display: none !important;
+      }
+      .sidebar-footer {
+        display: none !important;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+      }
+      .monitor-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+      }
+      .content-area {
+        padding: 1rem 0.75rem !important;
+      }
+      .top-bar {
+        padding: 0.85rem 1rem !important;
+      }
+      /* Override inline 1.5fr 1fr grids */
+      div[style*="grid-template-columns: 1.5fr 1fr"],
+      div[style*="grid-template-columns:1.5fr 1fr"],
+      div[style*="grid-template-columns: 1.5fr 1fr;"],
+      div[style*="grid-template-columns:1.5fr 1fr;"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid {
+        grid-template-columns: 1fr !important;
+      }
+      /* Stack inline forms or input rows */
+      .form-row {
+        flex-direction: column !important;
+        gap: 0.8rem !important;
+      }
+      .form-col {
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== LOGIN PAGE ========== -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-brand">
+      <svg viewBox="0 0 32 32" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 2 L4 7 L4 17 C4 23.5 9.2 28.8 16 30 C22.8 28.8 28 23.5 28 17 L28 7 Z" fill="#ff0033"/>
+        <path d="M17 8 L12.5 16 L16 16 L15 24 L19.5 16 L16 16 Z" fill="white"/>
+      </svg>
+      <span class="login-brand-text">HYPER<span>X</span></span>
+    </div>
+    <div class="login-subtitle">Owner Panel — Secure Access</div>
+    <form id="login-form">
+      <input type="text" id="admin-user" class="input-field" placeholder="Owner Username" required />
+      <input type="password" id="admin-pass" class="input-field" placeholder="Password" required />
+      <button type="submit" class="btn-login">ENTER DASHBOARD</button>
+    </form>
+  </div>
+</div>
+
+<!-- ========== DASHBOARD PAGE ========== -->
+<div id="dashboard-page">
+  <div class="dash-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="sidebar-logo">
+          <svg viewBox="0 0 32 32" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 2 L4 7 L4 17 C4 23.5 9.2 28.8 16 30 C22.8 28.8 28 23.5 28 17 L28 7 Z" fill="#ff0033"/>
+            <path d="M17 8 L12.5 16 L16 16 L15 24 L19.5 16 L16 16 Z" fill="white"/>
+          </svg>
+        </span>
+        <div class="sidebar-brand-name">
+          <strong>HYPER<span>X</span></strong>
+          <small>Owner Panel</small>
+        </div>
+      </div>
+
+      <div class="nav-items">
+        <span class="nav-group-label">Main</span>
+        <button class="tab-btn active" id="tab-overview" onclick="switchTab('overview')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Overview
+        </button>
+
+        <span class="nav-group-label">Management</span>
+        <button class="tab-btn" id="tab-orders" onclick="switchTab('orders')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Manage Orders
+          <span class="nav-badge" id="orders-badge">0</span>
+        </button>
+        <button class="tab-btn" id="tab-users" onclick="switchTab('users')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          User Credits
+        </button>
+        <button class="tab-btn" id="tab-keys" onclick="switchTab('keys')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          Key Generator
+        </button>
+        <button class="tab-btn" id="tab-products" onclick="switchTab('products')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Manage Products
+        </button>
+        <button class="tab-btn" id="tab-resellers" onclick="switchTab('resellers')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Resellers
+        </button>
+        <button class="tab-btn" id="tab-withdrawals" onclick="switchTab('withdrawals')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Withdrawals
+          <span class="nav-badge" id="withdrawals-badge">0</span>
+        </button>
+
+        <span class="nav-group-label">Tools</span>
+        <button class="tab-btn" id="tab-coupons" onclick="switchTab('coupons')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Coupons
+        </button>
+        <button class="tab-btn" id="tab-announcements" onclick="switchTab('announcements')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          Announcements
+        </button>
+        <button class="tab-btn" id="tab-logs" onclick="switchTab('logs')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Logs
+        </button>
+        <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+        <button class="tab-btn" id="tab-monitor" onclick="switchTab('monitor')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Activity Monitor
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-back-shop">
+          🏠 Back to Shop
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <div class="main-area">
+      <div class="top-bar">
+        <span id="top-bar-title">Overview</span>
+        <button class="btn-logout" onclick="adminLogout()">LOGOUT</button>
+      </div>
+
+      <div class="content-area">
+
+        <!-- ===== OVERVIEW ===== -->
+        <div class="tab-content active" id="content-overview">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Orders</div>
+              <div class="stat-val" id="stat-orders">0</div>
+              <div class="stat-sub">All time</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Registered Users</div>
+              <div class="stat-val" id="stat-users">0</div>
+              <div class="stat-sub">Accounts</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Keys</div>
+              <div class="stat-val" id="stat-keys">0</div>
+              <div class="stat-sub">Unused inventory</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Pending Orders</div>
+              <div class="stat-val" id="stat-pending" style="color: var(--yellow);">0</div>
+              <div class="stat-sub">Awaiting review</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">Recent Orders</span>
+                <button class="btn-action edit" onclick="switchTab('orders')">View All</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Order ID</th><th>User</th><th>Product</th><th>Price</th><th>Status</th></tr></thead>
+                  <tbody id="overview-orders-tbody">
+                    <tr><td colspan="5" style="text-align:center;color:var(--gray);">No orders yet</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header"><span class="section-title">Activity Feed</span></div>
+              <div class="activity-feed" id="activity-feed">
+                <div class="activity-item">
+                  <div style="display:flex;align-items:center;"><span class="act-dot"></span><span>System initialized</span></div>
+                  <span style="color:var(--gray);font-size:0.75rem;">Ready</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MANAGE ORDERS ===== -->
+        <div class="tab-content" id="content-orders">
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">All Orders</span>
+              <div style="display:flex;gap:0.5rem;">
+                <select class="input-sm" id="order-filter" style="padding:0.4rem 0.7rem;" onchange="loadOrders()">
+                  <option value="all">All Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th><th>User</th><th>Product</th><th>Duration</th>
+                    <th>Price</th><th>Method</th><th>UTR/Ref</th><th>Date</th><th>Status</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                  <tr><td colspan="10" style="text-align:center;color:var(--gray);">No orders placed yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== USER CREDITS ===== -->
+        <div class="tab-content" id="content-users">
+          <div class="section-card" style="margin-bottom:1.5rem;">
+            <div class="section-header"><span class="section-title">Add / Edit Credit Balance</span></div>
+            <div class="form-row">
+              <div class="form-col">
+                <label>Select User</label>
+                <select class="input-sm" id="credit-user-select"></select>
+              </div>
+              <div class="form-col">
+                <label>Credit Amount (₹)</label>
+                <input type="number" class="input-sm" id="credit-amount" placeholder="e.g. 500">
+              </div>
+              <button class="btn-red" onclick="addCredit()">UPDATE BALANCE</button>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-header"><span class="section-title">All Users</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Full Name</th><th>Email</th><th>Username</th><th>Balance</th><th>Keys Claimed</th><th>UID</th></tr></thead>
+                <tbody id="users-tbody">
+                  <tr><td colspan="6" style="text-align:center;color:var(--gray);">No registered users yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== KEY GENERATOR ===== -->
+        <div class="tab-content" id="content-keys">
+          <div class="section-card" style="margin-bottom:1.5rem;">
+            <div class="section-header"><span class="section-title">Add / Generate License Keys</span></div>
+            <div class="form-row">
+              <div class="form-col">
+                <label>Select Product</label>
+                <select class="input-sm" id="key-product"></select>
+              </div>
+              <div class="form-col">
+                <label>Duration</label>
+                <select class="input-sm" id="key-duration">
+                  <option value="1 Day">1 Day</option>
+                  <option value="7 Days">7 Days</option>
+                  <option value="30 Days">30 Days</option>
+                  <option value="Lifetime">Lifetime</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-col" style="margin-bottom:1rem;">
+              <label>Manual Keys (one per line, or comma separated — leave blank to auto-generate)</label>
+              <textarea class="input-sm" id="key-manual-input" rows="4" placeholder="KEY-ABC123&#10;KEY-XYZ456" style="font-family:monospace;"></textarea>
+            </div>
+            <button class="btn-red" onclick="generateKey()">ADD / GENERATE KEYS</button>
+          </div>
+          <div class="section-card">
+            <div class="section-header"><span class="section-title">All License Keys</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Key</th><th>Product</th><th>Duration</th><th>Created</th><th>Status</th><th>Assigned To</th><th>Actions</th></tr></thead>
+                <tbody id="keys-tbody">
+                  <tr><td colspan="7" style="text-align:center;color:var(--gray);">No keys generated yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MANAGE PRODUCTS ===== -->
+        <div class="tab-content" id="content-products">
+          <div class="section-card" style="margin-bottom:1.5rem;">
+            <div class="section-header">
+              <span class="section-title" id="prod-form-title">Add New Product</span>
+            </div>
+            <form id="product-form" onsubmit="return false">
+              <input type="hidden" id="prod-edit-index" value="-1">
+              <input type="hidden" id="prod-edit-category" value="">
+              <div class="form-row">
+                <div class="form-col">
+                  <label>Category</label>
+                  <select class="input-sm" id="prod-category">
+                    <option value="android">Android Panel</option>
+                    <option value="pc">PC Panel</option>
+                    <option value="ff">Free Fire ID</option>
+                    <option value="mystery">Mystery Box</option>
+                    <option value="ios">iOS Panel</option>
+                    <option value="pcgame">PC Game Panel</option>
+                  </select>
+                </div>
+                <div class="form-col">
+                  <label>Product Name</label>
+                  <input type="text" class="input-sm" id="prod-name" placeholder="e.g. HYPER VIP MOD">
+                </div>
+                <div class="form-col" style="max-width:130px;">
+                  <label>Price (₹)</label>
+                  <input type="number" class="input-sm" id="prod-price" placeholder="150">
+                </div>
+                <div class="form-col">
+                  <label>Stock / Status</label>
+                  <input type="text" class="input-sm" id="prod-stock" placeholder="50 IN STOCK">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col" style="max-width:120px;">
+                  <label>Emoji Icon</label>
+                  <input type="text" class="input-sm" id="prod-emoji" placeholder="📱">
+                </div>
+                <div class="form-col">
+                  <label>Gradient Theme</label>
+                  <select class="input-sm" id="prod-gradient">
+                    <option value="linear-gradient(135deg,#ff0033,#660000)">Red Glow</option>
+                    <option value="linear-gradient(135deg,#6a0dad,#1a0033)">Purple Shadow</option>
+                    <option value="linear-gradient(135deg,#006400,#001a00)">Green Stealth</option>
+                    <option value="linear-gradient(135deg,#0044cc,#000033)">Blue Matrix</option>
+                    <option value="linear-gradient(135deg,#ff6600,#330011)">Orange Flame</option>
+                  </select>
+                </div>
+                <div class="form-col">
+                  <label>License Type</label>
+                  <select class="input-sm" id="prod-badge">
+                    <option value="instock">In Stock (Limited)</option>
+                    <option value="digital">Digital License (Unlimited)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col">
+                  <label>Features Description</label>
+                  <input type="text" class="input-sm" id="prod-features" placeholder="Aimbot • No Recoil • Wallhack • Antiban">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col">
+                  <label>Product Image URL <small style="color:var(--gray);font-weight:400;">(Optional — leave blank for gradient)</small></label>
+                  <input type="url" class="input-sm" id="prod-image" placeholder="https://example.com/panel.jpg">
+                  <div id="prod-image-preview" style="display:none;margin-top:0.5rem;">
+                    <img id="prod-image-preview-img" src="" alt="Preview" style="max-height:100px;border-radius:6px;border:2px solid var(--border);object-fit:cover;">
+                  </div>
+                </div>
+                <div class="form-col">
+                  <label>Gameplay Video URL <small style="color:var(--gray);font-weight:400;">(YouTube Embed / raw video URL)</small></label>
+                  <input type="url" class="input-sm" id="prod-video" placeholder="https://www.youtube.com/embed/H9RnlKjjg88">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col">
+                  <label>Duration Options <small style="color:var(--gray);font-weight:400;">(Comma se alag karein)</small></label>
+                  <input type="text" class="input-sm" id="prod-durations" placeholder="e.g. 1 Day, 5 Days, 7 Days, 30 Days">
+                  <p style="font-size:0.72rem;color:var(--gray);margin-top:0.4rem;">⚠ Blank chodne par default: 1 Day, 7 Days, 30 Days, Lifetime</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.6rem;margin-top:0.5rem;">
+                <button class="btn-red" onclick="saveProduct()" id="prod-save-btn">SAVE PRODUCT</button>
+                <button type="button" onclick="resetProductForm()" style="background:var(--bg3);border:1px solid var(--border);color:var(--white);padding:0.7rem 1.2rem;border-radius:8px;font-family:var(--font-sub);font-weight:700;cursor:pointer;" id="prod-cancel-btn">CANCEL</button>
+              </div>
+            </form>
+          </div>
+          <div class="section-card">
+            <div class="section-header"><span class="section-title">All Products</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Category</th><th>Emoji</th><th>Name</th><th>Price</th><th>Stock</th><th>Features</th><th>Actions</th></tr></thead>
+                <tbody id="products-tbody">
+                  <tr><td colspan="7" style="text-align:center;color:var(--gray);">No products added yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== RESELLERS ===== -->
+        <div class="tab-content" id="content-resellers">
+          <div class="section-card" style="margin-bottom:1.5rem;">
+            <div class="section-header"><span class="section-title">Add Reseller Account</span></div>
+            <div class="form-row">
+              <div class="form-col">
+                <label>Select User</label>
+                <select class="input-sm" id="reseller-user-select"></select>
+              </div>
+              <div class="form-col">
+                <label>Discount Rate (%)</label>
+                <input type="number" class="input-sm" id="reseller-discount" placeholder="e.g. 20" min="0" max="100">
+              </div>
+              <div class="form-col">
+                <label>Credit Limit (₹)</label>
+                <input type="number" class="input-sm" id="reseller-credit-limit" placeholder="e.g. 10000">
+              </div>
+              <button class="btn-red" onclick="addReseller()">MAKE RESELLER</button>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-header"><span class="section-title">Reseller Accounts</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Username</th><th>Email</th><th>Discount Rate</th><th>Credit Limit</th><th>Wallet Balance</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="resellers-tbody">
+                  <tr><td colspan="7" style="text-align:center;color:var(--gray);">No resellers added yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== WITHDRAWALS ===== -->
+        <div class="tab-content" id="content-withdrawals">
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">Withdrawal Requests</span>
+              <select class="input-sm" id="withdrawal-filter" style="padding:0.4rem 0.7rem;" onchange="loadWithdrawals()">
+                <option value="all">All</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Req ID</th><th>Username</th><th>Amount</th><th>Method</th><th>Account Details</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="withdrawals-tbody">
+                  <tr><td colspan="8" style="text-align:center;color:var(--gray);">No withdrawal requests yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== COUPONS ===== -->
+        <div class="tab-content" id="content-coupons">
+          <div class="section-card" style="margin-bottom:1.5rem;">
+            <div class="section-header"><span class="section-title">Create New Coupon</span></div>
+            <div class="form-row">
+              <div class="form-col">
+                <label>Coupon Code</label>
+                <input type="text" class="input-sm" id="coupon-code" placeholder="e.g. HYPERX50" style="text-transform:uppercase;">
+              </div>
+              <div class="form-col">
+                <label>Discount Type</label>
+                <select class="input-sm" id="coupon-type">
+                  <option value="percent">Percentage (%)</option>
+                  <option value="flat">Flat Amount (₹)</option>
+                </select>
+              </div>
+              <div class="form-col">
+                <label>Discount Value</label>
+                <input type="number" class="input-sm" id="coupon-value" placeholder="e.g. 20">
+              </div>
+              <div class="form-col">
+                <label>Max Uses</label>
+                <input type="number" class="input-sm" id="coupon-max-uses" placeholder="e.g. 100">
+              </div>
+              <button class="btn-red" onclick="createCoupon()">CREATE COUPON</button>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-header"><span class="section-title">Active Coupons</span></div>
+            <div id="coupons-list" style="display:flex;flex-direction:column;gap:0.8rem;">
+              <p style="text-align:center;color:var(--gray);font-size:0.9rem;">No coupons created yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ANNOUNCEMENTS ===== -->
+        <div class="tab-content" id="content-announcements">
+          <div class="section-card" style="margin-bottom:1.5rem;">
+            <div class="section-header"><span class="section-title">Post New Announcement</span></div>
+            <div class="form-row">
+              <div class="form-col">
+                <label>Title</label>
+                <input type="text" class="input-sm" id="ann-title" placeholder="e.g. Server Maintenance">
+              </div>
+              <div class="form-col">
+                <label>Type</label>
+                <select class="input-sm" id="ann-type">
+                  <option value="info">ℹ️ Info</option>
+                  <option value="warning">⚠️ Warning</option>
+                  <option value="success">✅ Success</option>
+                  <option value="promo">🎁 Promo</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-col" style="margin-bottom:1rem;">
+              <label>Message</label>
+              <textarea class="input-sm" id="ann-body" rows="3" placeholder="Write announcement message here..."></textarea>
+            </div>
+            <button class="btn-red" onclick="postAnnouncement()">POST ANNOUNCEMENT</button>
+          </div>
+          <div class="section-card">
+            <div class="section-header"><span class="section-title">Posted Announcements</span></div>
+            <div id="announcements-list" style="display:flex;flex-direction:column;gap:0;">
+              <p style="text-align:center;color:var(--gray);font-size:0.9rem;">No announcements posted yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== LOGS ===== -->
+        <div class="tab-content" id="content-logs">
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">System Logs</span>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn-action edit" onclick="clearLogs()">Clear Logs</button>
+                <button class="btn-action copy" onclick="downloadLogs()">Export</button>
+              </div>
+            </div>
+            <div class="log-terminal" id="log-terminal">
+              <div class="log-line system">[SYSTEM] — HYPERX Owner Panel initialized successfully</div>
+              <div class="log-line info">[INFO] — Admin session started</div>
+              <div class="log-line info">[INFO] — LocalStorage data loaded</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SETTINGS ===== -->
+        <div class="tab-content" id="content-settings">
+          <div class="section-card" style="max-width:640px;">
+            <div class="section-header"><span class="section-title">Payment Configuration</span></div>
+            <form id="settings-form" onsubmit="savePaymentSettings(event); return false;">
+              <div class="form-col" style="margin-bottom:1rem;">
+                <label>UPI ID</label>
+                <input type="text" class="input-sm" id="set-upi-id" placeholder="example@ybl">
+              </div>
+              <div class="form-col" style="margin-bottom:1rem;">
+                <label>USDT (TRC20) Address</label>
+                <input type="text" class="input-sm" id="set-crypto-addr" placeholder="TYuG8Jp99...">
+              </div>
+              <div class="form-col" style="margin-bottom:1rem;">
+                <label>Admin Password (change)</label>
+                <input type="password" class="input-sm" id="set-new-pass" placeholder="New password (leave blank to keep)">
+              </div>
+              <div class="form-col" style="margin-bottom:1.5rem;">
+                <label>WhatsApp Support Number</label>
+                <input type="text" class="input-sm" id="set-whatsapp" placeholder="+91 9XXXXXXXXX">
+              </div>
+              <button type="submit" class="btn-red" style="padding:0.75rem 2rem;">SAVE SETTINGS</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===== ACTIVITY MONITOR ===== -->
+        <div class="tab-content" id="content-monitor">
+          <div class="monitor-grid">
+            <div class="monitor-card">
+              <div class="monitor-val" style="color:var(--green);" id="mon-users-online">0</div>
+              <div class="monitor-label"><span class="pulse"></span>Users Online</div>
+            </div>
+            <div class="monitor-card">
+              <div class="monitor-val" id="mon-orders-today" style="color:var(--yellow);">0</div>
+              <div class="monitor-label">Orders Today</div>
+            </div>
+            <div class="monitor-card">
+              <div class="monitor-val" id="mon-revenue" style="color:var(--red);">₹0</div>
+              <div class="monitor-label">Total Revenue</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:1.5rem;">
+            <div class="section-card">
+              <div class="section-header"><span class="section-title">Sales Activity (Last 7 Days)</span></div>
+              <div class="chart-bar-wrap" id="chart-bar-wrap">
+                <!-- bars injected by JS -->
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header"><span class="section-title">Live Activity Feed</span></div>
+              <div class="activity-feed" id="monitor-feed">
+                <div class="activity-item">
+                  <div style="display:flex;align-items:center;"><span class="act-dot"></span><span>System running normally</span></div>
+                  <span style="color:var(--gray);font-size:0.75rem;">Now</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end content-area -->
+    </div><!-- end main-area -->
+  </div><!-- end dash-layout -->
+</div><!-- end dashboard-page -->
+
+<script>
+  // ===== AUTH =====
+  const loginPage   = document.getElementById('login-page');
+  const dashPage    = document.getElementById('dashboard-page');
+
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('admin-user').value;
+    const pass = document.getElementById('admin-pass').value;
+    const settings = JSON.parse(localStorage.getItem('paymentSettings') || '{}');
+    const storedPass = settings.adminPassword || 'hyperm2000';
+
+    if (user === 'hyperm' && pass === storedPass) {
+      localStorage.setItem('adminLoggedIn', 'true');
+      showDashboard();
+      addLog('info', `Admin login successful from session`);
+    } else {
+      alert('Invalid Owner Credentials!');
+      addLog('warn', `Failed login attempt`);
+    }
+  });
+
+  function checkLogin() {
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      showDashboard();
+    } else {
+      window.location.href = 'auth.html?mode=signin';
+    }
+  }
+
+  function showDashboard() {
+    loginPage.style.display = 'none';
+    dashPage.style.display = 'block';
+    loadAllData();
+  }
+
+  function adminLogout() {
+    localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('currentUser');
+    window.location.href = 'index.html';
+  }
+
+  // ===== TAB SWITCHING =====
+  const tabTitles = {
+    overview: 'Overview',
+    orders: 'Manage Orders',
+    users: 'User Credits',
+    keys: 'Key Generator',
+    products: 'Manage Products',
+    resellers: 'Resellers',
+    withdrawals: 'Withdrawals',
+    coupons: 'Coupons',
+    announcements: 'Announcements',
+    logs: 'System Logs',
+    settings: 'Settings',
+    monitor: 'Activity Monitor'
+  };
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('content-' + tab).classList.add('active');
+    document.getElementById('top-bar-title').textContent = tabTitles[tab] || tab;
+
+    if (tab === 'overview')      loadOverview();
+    if (tab === 'orders')        loadOrders();
+    if (tab === 'users')         loadUsers();
+    if (tab === 'keys')          loadKeys();
+    if (tab === 'products')      loadProducts();
+    if (tab === 'resellers')     loadResellers();
+    if (tab === 'withdrawals')   loadWithdrawals();
+    if (tab === 'coupons')       loadCoupons();
+    if (tab === 'announcements') loadAnnouncements();
+    if (tab === 'settings')      loadSettings();
+    if (tab === 'monitor')       loadMonitor();
+  }
+
+  // ===== LOAD ALL DATA =====
+  function loadAllData() {
+    loadOverview();
+    updateBadges();
+  }
+
+  function updateBadges() {
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const pending = orders.filter(o => o.status === 'Pending').length;
+    document.getElementById('orders-badge').textContent = pending;
+    document.getElementById('orders-badge').style.display = pending > 0 ? 'inline' : 'none';
+
+    const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+    const wPending = withdrawals.filter(w => w.status === 'Pending').length;
+    document.getElementById('withdrawals-badge').textContent = wPending;
+    document.getElementById('withdrawals-badge').style.display = wPending > 0 ? 'inline' : 'none';
+  }
+
+  // ===== OVERVIEW =====
+  function loadOverview() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const keys = JSON.parse(localStorage.getItem('keys') || '[]');
+    const pending = orders.filter(o => o.status === 'Pending');
+
+    document.getElementById('stat-users').textContent = users.length;
+    document.getElementById('stat-orders').textContent = orders.length;
+    document.getElementById('stat-keys').textContent = keys.filter(k => k.status === 'Unused').length;
+    document.getElementById('stat-pending').textContent = pending.length;
+
+    // Recent 5 orders
+    const tbody = document.getElementById('overview-orders-tbody');
+    const recent = orders.slice(-5).reverse();
+    if (recent.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--gray);">No orders yet</td></tr>';
+    } else {
+      tbody.innerHTML = recent.map(o => `
+        <tr>
+          <td><code style="font-size:0.78rem;color:var(--red);">${o.id}</code></td>
+          <td>${o.username || o.contact || '—'}</td>
+          <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${o.product}">${o.product}</td>
+          <td>${o.price}</td>
+          <td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  // ===== ORDERS =====
+  function loadOrders() {
+    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const filter = document.getElementById('order-filter')?.value || 'all';
+    if (filter !== 'all') orders = orders.filter(o => o.status === filter);
+
+    const tbody = document.getElementById('orders-tbody');
+    if (orders.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--gray);">No orders found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = orders.reverse().map(o => `
+      <tr>
+        <td><code style="font-size:0.75rem;color:var(--red);">${o.id}</code></td>
+        <td>${o.contact}</td>
+        <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${o.product}">${o.product}</td>
+        <td><span style="background:var(--bg3);border:1px solid var(--border);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:var(--red);font-weight:700;">${o.duration || 'N/A'}</span></td>
+        <td>${o.price}</td>
+        <td>${o.method}</td>
+        <td><code style="font-size:0.78rem;">${o.utr}</code></td>
+        <td style="font-size:0.78rem;color:var(--gray);">${o.date}</td>
+        <td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td>
+        <td>
+          ${o.status === 'Pending' ? `
+            <button class="btn-action approve" onclick="updateOrderStatus('${o.id}','Approved')">Approve</button>
+            <button class="btn-action reject" onclick="updateOrderStatus('${o.id}','Rejected')">Reject</button>
+          ` : `<span style="color:var(--gray);font-size:0.78rem;">—</span>`}
+        </td>
+      </tr>
+    `).join('');
+    updateBadges();
+  }
+
+  function updateOrderStatus(orderId, newStatus) {
+    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const idx = orders.findIndex(o => o.id === orderId);
+    if (idx === -1) return;
+    orders[idx].status = newStatus;
+    localStorage.setItem('orders', JSON.stringify(orders));
+
+    if (newStatus === 'Approved') {
+      const isWalletFunds = orders[idx].product.includes('WALLET_FUNDS');
+      if (isWalletFunds) {
+        const buyerUsername = orders[idx].username;
+        if (buyerUsername && buyerUsername !== 'Guest') {
+          let users = JSON.parse(localStorage.getItem('users') || '[]');
+          const userIdx = users.findIndex(u => u.username === buyerUsername);
+          if (userIdx !== -1) {
+            const matches = orders[idx].product.match(/\d+/);
+            const amount = matches ? parseFloat(matches[0]) : 0;
+            users[userIdx].balance = (users[userIdx].balance || 0) + amount;
+            localStorage.setItem('users', JSON.stringify(users));
+            alert(`Order ${orderId} Approved!\nAdded ₹${amount} credit to user ${buyerUsername}.`);
+          }
+        }
+      } else {
+        let keys = JSON.parse(localStorage.getItem('keys') || '[]');
+        const keyIdx = keys.findIndex(k => k.product === orders[idx].product && k.status === 'Unused');
+        let allocatedKey = '';
+        if (keyIdx !== -1) {
+          keys[keyIdx].status = 'Used';
+          keys[keyIdx].assignedTo = orders[idx].username || orders[idx].contact || 'Guest';
+          keys[keyIdx].orderId = orderId;
+          keys[keyIdx].useDate = new Date().toLocaleDateString();
+          allocatedKey = keys[keyIdx].key;
+          localStorage.setItem('keys', JSON.stringify(keys));
+          alert(`Order ${orderId} Approved!\nKey allocated: ${allocatedKey}`);
+        } else {
+          allocatedKey = generateRandomKey();
+          keys.push({ key: allocatedKey, product: orders[idx].product, duration: '30 Days', date: new Date().toLocaleDateString(), status: 'Used', assignedTo: orders[idx].username || 'Guest', orderId, useDate: new Date().toLocaleDateString() });
+          localStorage.setItem('keys', JSON.stringify(keys));
+          alert(`Order ${orderId} Approved!\nAuto-generated key: ${allocatedKey}`);
+        }
+        const buyerUsername = orders[idx].username;
+        if (buyerUsername && buyerUsername !== 'Guest') {
+          let users = JSON.parse(localStorage.getItem('users') || '[]');
+          const uIdx = users.findIndex(u => u.username === buyerUsername);
+          if (uIdx !== -1) { users[uIdx].keysClaimed = (users[uIdx].keysClaimed || 0) + 1; localStorage.setItem('users', JSON.stringify(users)); }
+        }
+      }
+      addLog('info', `Order ${orderId} approved by admin`);
+    } else {
+      alert(`Order ${orderId} Rejected.`);
+      addLog('warn', `Order ${orderId} rejected by admin`);
+    }
+    loadOrders();
+    loadOverview();
+  }
+
+  // ===== USERS =====
+  function loadUsers() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const tbody = document.getElementById('users-tbody');
+    const select = document.getElementById('credit-user-select');
+    tbody.innerHTML = '';
+    select.innerHTML = '';
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);">No registered users yet.</td></tr>';
+      return;
+    }
+    users.forEach(u => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td><strong>${u.username}</strong></td>
+          <td style="color:var(--green);font-weight:700;">₹${(u.balance||0).toFixed(2)}</td>
+          <td>${u.keysClaimed || 0}</td>
+          <td style="font-size:0.78rem;color:var(--gray);">${u.uid || '—'}</td>
+        </tr>
+      `;
+      const opt = document.createElement('option');
+      opt.value = u.username;
+      opt.innerText = `${u.username} (${u.name})`;
+      select.appendChild(opt);
+    });
+
+    // Load reseller dropdown too
+    const rSelect = document.getElementById('reseller-user-select');
+    if (rSelect) {
+      rSelect.innerHTML = '';
+      users.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.username;
+        opt.innerText = `${u.username} (${u.name})`;
+        rSelect.appendChild(opt);
+      });
+    }
+  }
+
+  function addCredit() {
+    const username = document.getElementById('credit-user-select').value;
+    const amount   = parseFloat(document.getElementById('credit-amount').value);
+    if (!username || isNaN(amount)) return;
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    const idx = users.findIndex(u => u.username === username);
+    if (idx !== -1) {
+      users[idx].balance = (users[idx].balance || 0) + amount;
+      localStorage.setItem('users', JSON.stringify(users));
+      alert(`✅ Added ₹${amount} credit to ${username}!`);
+      document.getElementById('credit-amount').value = '';
+      loadUsers();
+      addLog('info', `Manually credited ₹${amount} to user ${username}`);
+    }
+  }
+
+  // ===== KEYS =====
+  function loadKeys() {
+    const keys = JSON.parse(localStorage.getItem('keys') || '[]');
+    const products = JSON.parse(localStorage.getItem('products') || '{}');
+    const keyProdSelect = document.getElementById('key-product');
+
+    // Populate product select
+    keyProdSelect.innerHTML = '';
+    let hasProducts = false;
+    const catMap = { android:'Android Panel', pc:'PC Panel', ff:'Free Fire ID', mystery:'Mystery Box', ios:'iOS Panel', pcgame:'PC Game Panel' };
+    Object.keys(products).forEach(cat => {
+      (products[cat] || []).forEach(p => {
+        hasProducts = true;
+        const opt = document.createElement('option');
+        opt.value = p.name;
+        opt.innerText = `${p.name} (${catMap[cat]})`;
+        keyProdSelect.appendChild(opt);
+      });
+    });
+    if (!hasProducts) {
+      const opt = document.createElement('option');
+      opt.value = 'HYPER X PANEL';
+      opt.innerText = 'HYPER X PANEL';
+      keyProdSelect.appendChild(opt);
+    }
+
+    const tbody = document.getElementById('keys-tbody');
+    if (keys.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);">No keys generated yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = keys.map(k => `
+      <tr>
+        <td><code style="color:var(--green);font-size:0.82rem;">${k.key}</code></td>
+        <td>${k.product}</td>
+        <td>${k.duration}</td>
+        <td style="font-size:0.78rem;color:var(--gray);">${k.date}</td>
+        <td><span class="badge badge-${k.status === 'Unused' ? 'unused' : 'used'}">${k.status}</span></td>
+        <td>${k.assignedTo ? `<strong style="color:var(--gray);">${k.assignedTo}</strong>` : '—'}</td>
+        <td><button class="btn-action copy" onclick="navigator.clipboard.writeText('${k.key}');alert('Key Copied!')">COPY</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function generateRandomKey() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let r = '';
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) r += chars[Math.floor(Math.random() * chars.length)];
+      if (i < 3) r += '-';
+    }
+    return 'HYPER-' + r;
+  }
+
+  function generateKey() {
+    const product  = document.getElementById('key-product').value;
+    const duration = document.getElementById('key-duration').value;
+    const manual   = document.getElementById('key-manual-input').value.trim();
+    let keys = JSON.parse(localStorage.getItem('keys') || '[]');
+
+    if (manual) {
+      const lines = manual.split(/[\r\n,]+/);
+      let added = 0;
+      lines.forEach(line => {
+        const k = line.trim();
+        if (k && !keys.some(existing => existing.key.toUpperCase() === k.toUpperCase())) {
+          keys.push({ key: k, product, duration, date: new Date().toLocaleDateString(), status: 'Unused', assignedTo: '', orderId: '' });
+          added++;
+        }
+      });
+      localStorage.setItem('keys', JSON.stringify(keys));
+      alert(`✅ Added ${added} manual keys for "${product}"!`);
+      addLog('info', `${added} manual keys added for ${product}`);
+    } else {
+      const newKey = generateRandomKey();
+      keys.push({ key: newKey, product, duration, date: new Date().toLocaleDateString(), status: 'Unused', assignedTo: '', orderId: '' });
+      localStorage.setItem('keys', JSON.stringify(keys));
+      alert(`✅ Generated key:\n${newKey}`);
+      addLog('info', `Key generated for ${product} [${duration}]`);
+    }
+    document.getElementById('key-manual-input').value = '';
+    loadKeys();
+  }
+
+  // ===== PRODUCTS =====
+  const catMapFull = { android:'Android Panel', pc:'PC Panel', ff:'Free Fire ID', mystery:'Mystery Box', ios:'iOS Panel', pcgame:'PC Game Panel' };
+
+  function loadProducts() {
+    const products = JSON.parse(localStorage.getItem('products') || '{}');
+    const tbody = document.getElementById('products-tbody');
+    tbody.innerHTML = '';
+    let count = 0;
+    Object.keys(products).forEach(cat => {
+      (products[cat] || []).forEach((p, idx) => {
+        count++;
+        tbody.innerHTML += `
+          <tr>
+            <td><span style="color:var(--red);font-weight:700;text-transform:uppercase;">${catMapFull[cat]}</span></td>
+            <td style="font-size:1.2rem;">${p.emoji || '⚡'}</td>
+            <td><strong>${p.name}</strong></td>
+            <td style="color:var(--green);font-weight:700;">₹${p.price}</td>
+            <td>${p.stock}</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${p.features}">${p.features}</td>
+            <td>
+              <button class="btn-action edit" onclick="editProduct('${cat}',${idx})">Edit</button>
+              <button class="btn-action reject" onclick="deleteProduct('${cat}',${idx})">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    });
+    if (count === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);">No products in store. Add some!</td></tr>';
+    }
+  }
+
+  function saveProduct() {
+    const category = document.getElementById('prod-category').value;
+    const name     = document.getElementById('prod-name').value.trim();
+    const price    = parseFloat(document.getElementById('prod-price').value);
+    const stock    = document.getElementById('prod-stock').value.trim();
+    const emoji    = document.getElementById('prod-emoji').value.trim();
+    const gradient = document.getElementById('prod-gradient').value;
+    const badge    = document.getElementById('prod-badge').value;
+    const features = document.getElementById('prod-features').value.trim();
+    const image    = document.getElementById('prod-image').value.trim();
+    const videoUrl = document.getElementById('prod-video').value.trim();
+    const durRaw   = document.getElementById('prod-durations').value.trim();
+    const editIdx  = parseInt(document.getElementById('prod-edit-index').value);
+    const editCat  = document.getElementById('prod-edit-category').value;
+
+    if (!name || isNaN(price) || !stock || !emoji || !features) { alert('Please fill all required fields!'); return; }
+
+    let durationsArr = durRaw ? durRaw.split(',').map(d => d.trim()).filter(Boolean) : [];
+
+    let products = JSON.parse(localStorage.getItem('products') || '{}');
+    const newProd = { name, price, stock, features, emoji, gradient, badge, image: image||'', videoUrl: videoUrl||'', durations: durationsArr };
+
+    if (editIdx === -1) {
+      if (!products[category]) products[category] = [];
+      products[category].push(newProd);
+      alert('Product added!');
+      addLog('info', `New product added: ${name}`);
+    } else {
+      if (editCat === category) {
+        products[category][editIdx] = newProd;
+      } else {
+        products[editCat].splice(editIdx, 1);
+        if (!products[category]) products[category] = [];
+        products[category].push(newProd);
+      }
+      alert('Product updated!');
+    }
+    localStorage.setItem('products', JSON.stringify(products));
+    resetProductForm();
+    loadProducts();
+  }
+
+  function editProduct(category, idx) {
+    const products = JSON.parse(localStorage.getItem('products') || '{}');
+    const p = products[category][idx];
+    if (!p) return;
+    document.getElementById('prod-form-title').innerText = 'Edit Product: ' + p.name;
+    document.getElementById('prod-category').value = category;
+    document.getElementById('prod-category').disabled = true;
+    document.getElementById('prod-name').value = p.name;
+    document.getElementById('prod-price').value = p.price;
+    document.getElementById('prod-stock').value = p.stock;
+    document.getElementById('prod-emoji').value = p.emoji||'';
+    document.getElementById('prod-gradient').value = p.gradient||'linear-gradient(135deg,#ff0033,#1a0000)';
+    document.getElementById('prod-badge').value = p.badge||'instock';
+    document.getElementById('prod-features').value = p.features;
+    document.getElementById('prod-image').value = p.image||'';
+    document.getElementById('prod-video').value = p.videoUrl||'';
+    document.getElementById('prod-durations').value = p.durations?.join(', ') || '';
+    document.getElementById('prod-edit-index').value = idx;
+    document.getElementById('prod-edit-category').value = category;
+    document.getElementById('prod-save-btn').innerText = 'UPDATE PRODUCT';
+    if (p.image) {
+      document.getElementById('prod-image-preview').style.display = 'block';
+      document.getElementById('prod-image-preview-img').src = p.image;
+    }
+    document.getElementById('content-products').scrollTop = 0;
+  }
+
+  function deleteProduct(category, idx) {
+    if (!confirm('Delete this product?')) return;
+    let products = JSON.parse(localStorage.getItem('products') || '{}');
+    products[category].splice(idx, 1);
+    localStorage.setItem('products', JSON.stringify(products));
+    alert('Product deleted!');
+    addLog('warn', `Product deleted from category ${catMapFull[category]}`);
+    loadProducts();
+  }
+
+  function resetProductForm() {
+    document.getElementById('product-form').reset();
+    document.getElementById('prod-edit-index').value = '-1';
+    document.getElementById('prod-edit-category').value = '';
+    document.getElementById('prod-category').disabled = false;
+    document.getElementById('prod-form-title').innerText = 'Add New Product';
+    document.getElementById('prod-save-btn').innerText = 'SAVE PRODUCT';
+    document.getElementById('prod-image-preview').style.display = 'none';
+    document.getElementById('prod-image-preview-img').src = '';
+    document.getElementById('prod-durations').value = '';
+  }
+
+  // Image preview
+  document.addEventListener('DOMContentLoaded', () => {
+    const imgInput = document.getElementById('prod-image');
+    if (imgInput) {
+      imgInput.addEventListener('input', () => {
+        const url = imgInput.value.trim();
+        document.getElementById('prod-image-preview').style.display = url ? 'block' : 'none';
+        document.getElementById('prod-image-preview-img').src = url;
+      });
+    }
+  });
+
+  // ===== RESELLERS =====
+  function loadResellers() {
+    loadUsers(); // Refresh user dropdowns too
+    const resellers = JSON.parse(localStorage.getItem('resellers') || '[]');
+    const tbody = document.getElementById('resellers-tbody');
+    if (resellers.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);">No resellers added yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = resellers.map((r, i) => `
+      <tr>
+        <td><strong>${r.username}</strong></td>
+        <td style="color:var(--gray);">${r.email || '—'}</td>
+        <td style="color:var(--yellow);font-weight:700;">${r.discount}%</td>
+        <td>₹${r.creditLimit || 0}</td>
+        <td style="color:var(--green);font-weight:700;">₹${r.walletBalance || 0}</td>
+        <td><span class="badge badge-reseller">RESELLER</span></td>
+        <td><button class="btn-action reject" onclick="removeReseller(${i})">Remove</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function addReseller() {
+    const username = document.getElementById('reseller-user-select').value;
+    const discount = parseFloat(document.getElementById('reseller-discount').value);
+    const creditLimit = parseFloat(document.getElementById('reseller-credit-limit').value);
+    if (!username || isNaN(discount)) { alert('Please fill all fields!'); return; }
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.username === username);
+    let resellers = JSON.parse(localStorage.getItem('resellers') || '[]');
+    if (resellers.some(r => r.username === username)) { alert('This user is already a reseller!'); return; }
+    resellers.push({ username, email: user?.email || '', discount, creditLimit: creditLimit || 0, walletBalance: 0, since: new Date().toLocaleDateString() });
+    localStorage.setItem('resellers', JSON.stringify(resellers));
+    alert(`${username} is now a Reseller with ${discount}% discount!`);
+    addLog('info', `User ${username} promoted to Reseller`);
+    loadResellers();
+  }
+
+  function removeReseller(idx) {
+    if (!confirm('Remove this reseller?')) return;
+    let resellers = JSON.parse(localStorage.getItem('resellers') || '[]');
+    const name = resellers[idx]?.username;
+    resellers.splice(idx, 1);
+    localStorage.setItem('resellers', JSON.stringify(resellers));
+    addLog('warn', `Reseller ${name} removed`);
+    loadResellers();
+  }
+
+  // ===== WITHDRAWALS =====
+  function loadWithdrawals() {
+    let withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+    const filter = document.getElementById('withdrawal-filter')?.value || 'all';
+    if (filter !== 'all') withdrawals = withdrawals.filter(w => w.status === filter);
+    const tbody = document.getElementById('withdrawals-tbody');
+    if (withdrawals.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--gray);">No withdrawal requests yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = withdrawals.reverse().map((w, i) => `
+      <tr>
+        <td><code style="font-size:0.75rem;color:var(--red);">${w.id}</code></td>
+        <td><strong>${w.username}</strong></td>
+        <td style="color:var(--green);font-weight:700;">₹${w.amount}</td>
+        <td>${w.method}</td>
+        <td style="font-size:0.8rem;color:var(--gray);">${w.accountDetails}</td>
+        <td style="font-size:0.78rem;color:var(--gray);">${w.date}</td>
+        <td><span class="badge badge-${w.status.toLowerCase()}">${w.status}</span></td>
+        <td>
+          ${w.status === 'Pending' ? `
+            <button class="btn-action approve" onclick="updateWithdrawal('${w.id}','Approved')">Approve</button>
+            <button class="btn-action reject" onclick="updateWithdrawal('${w.id}','Rejected')">Reject</button>
+          ` : '—'}
+        </td>
+      </tr>
+    `).join('');
+    updateBadges();
+  }
+
+  function updateWithdrawal(id, status) {
+    let withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+    const idx = withdrawals.findIndex(w => w.id === id);
+    if (idx === -1) return;
+    withdrawals[idx].status = status;
+    if (status === 'Approved') {
+      // Deduct from user balance
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      const uIdx = users.findIndex(u => u.username === withdrawals[idx].username);
+      if (uIdx !== -1 && users[uIdx].balance >= withdrawals[idx].amount) {
+        users[uIdx].balance -= withdrawals[idx].amount;
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      addLog('info', `Withdrawal of ₹${withdrawals[idx].amount} approved for ${withdrawals[idx].username}`);
+    } else {
+      addLog('warn', `Withdrawal ${id} rejected`);
+    }
+    localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
+    alert(`Withdrawal ${id} ${status}!`);
+    loadWithdrawals();
+  }
+
+  // ===== COUPONS =====
+  function loadCoupons() {
+    const coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
+    const container = document.getElementById('coupons-list');
+    if (coupons.length === 0) {
+      container.innerHTML = '<p style="text-align:center;color:var(--gray);font-size:0.9rem;">No coupons created yet.</p>';
+      return;
+    }
+    container.innerHTML = coupons.map((c, i) => `
+      <div class="coupon-card">
+        <div>
+          <div class="coupon-code">${c.code}</div>
+          <div style="font-size:0.78rem;color:var(--gray);margin-top:0.3rem;">${c.type === 'percent' ? c.value + '% OFF' : '₹' + c.value + ' OFF'} | Used: ${c.used || 0} / ${c.maxUses || '∞'}</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <span class="badge badge-active">ACTIVE</span>
+          <button class="btn-action copy" onclick="navigator.clipboard.writeText('${c.code}');alert('Copied!')">COPY</button>
+          <button class="btn-action reject" onclick="deleteCoupon(${i})">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function createCoupon() {
+    const code     = document.getElementById('coupon-code').value.trim().toUpperCase();
+    const type     = document.getElementById('coupon-type').value;
+    const value    = parseFloat(document.getElementById('coupon-value').value);
+    const maxUses  = parseInt(document.getElementById('coupon-max-uses').value) || 0;
+    if (!code || isNaN(value)) { alert('Please fill coupon code and value!'); return; }
+    let coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
+    if (coupons.some(c => c.code === code)) { alert('Coupon code already exists!'); return; }
+    coupons.push({ code, type, value, maxUses, used: 0, createdAt: new Date().toLocaleDateString() });
+    localStorage.setItem('coupons', JSON.stringify(coupons));
+    alert(`Coupon "${code}" created!`);
+    addLog('info', `Coupon created: ${code}`);
+    document.getElementById('coupon-code').value = '';
+    document.getElementById('coupon-value').value = '';
+    loadCoupons();
+  }
+
+  function deleteCoupon(idx) {
+    if (!confirm('Delete this coupon?')) return;
+    let coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
+    coupons.splice(idx, 1);
+    localStorage.setItem('coupons', JSON.stringify(coupons));
+    loadCoupons();
+  }
+
+  // ===== ANNOUNCEMENTS =====
+  const annColors = { info: '#3b82f6', warning: '#f59e0b', success: '#22c55e', promo: '#a855f7' };
+
+  function loadAnnouncements() {
+    const anns = JSON.parse(localStorage.getItem('announcements') || '[]');
+    const container = document.getElementById('announcements-list');
+    if (anns.length === 0) {
+      container.innerHTML = '<p style="text-align:center;color:var(--gray);font-size:0.9rem;">No announcements posted yet.</p>';
+      return;
+    }
+    container.innerHTML = anns.map((a, i) => `
+      <div class="announcement-card" style="border-left-color:${annColors[a.type] || 'var(--red)'};">
+        <div>
+          <div style="font-family:var(--font-sub);font-weight:700;font-size:1rem;margin-bottom:0.3rem;">${a.title}</div>
+          <div style="font-size:0.85rem;color:var(--gray);line-height:1.5;">${a.body}</div>
+          <div style="font-size:0.72rem;color:var(--gray);margin-top:0.4rem;">${a.date}</div>
+        </div>
+        <button class="btn-action reject" onclick="deleteAnnouncement(${i})">Delete</button>
+      </div>
+    `).join('');
+  }
+
+  function postAnnouncement() {
+    const title = document.getElementById('ann-title').value.trim();
+    const type  = document.getElementById('ann-type').value;
+    const body  = document.getElementById('ann-body').value.trim();
+    if (!title || !body) { alert('Please fill title and message!'); return; }
+    let anns = JSON.parse(localStorage.getItem('announcements') || '[]');
+    anns.unshift({ title, type, body, date: new Date().toLocaleString() });
+    localStorage.setItem('announcements', JSON.stringify(anns));
+    alert('Announcement posted!');
+    addLog('info', `Announcement posted: "${title}"`);
+    document.getElementById('ann-title').value = '';
+    document.getElementById('ann-body').value = '';
+    loadAnnouncements();
+  }
+
+  function deleteAnnouncement(idx) {
+    if (!confirm('Delete this announcement?')) return;
+    let anns = JSON.parse(localStorage.getItem('announcements') || '[]');
+    anns.splice(idx, 1);
+    localStorage.setItem('announcements', JSON.stringify(anns));
+    loadAnnouncements();
+  }
+
+  // ===== LOGS =====
+  function addLog(type, message) {
+    const terminal = document.getElementById('log-terminal');
+    if (!terminal) return;
+    const line = document.createElement('div');
+    line.className = `log-line ${type}`;
+    const time = new Date().toLocaleTimeString();
+    line.textContent = `[${time}] [${type.toUpperCase()}] — ${message}`;
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+
+    // Save to localStorage
+    let logs = JSON.parse(localStorage.getItem('adminLogs') || '[]');
+    logs.push({ time, type, message });
+    if (logs.length > 200) logs = logs.slice(-200);
+    localStorage.setItem('adminLogs', JSON.stringify(logs));
+  }
+
+  function loadLogs() {
+    const logs = JSON.parse(localStorage.getItem('adminLogs') || '[]');
+    const terminal = document.getElementById('log-terminal');
+    terminal.innerHTML = '<div class="log-line system">[SYSTEM] — HYPERX Owner Panel initialized</div>';
+    logs.slice(-80).forEach(l => {
+      const line = document.createElement('div');
+      line.className = `log-line ${l.type}`;
+      line.textContent = `[${l.time}] [${l.type.toUpperCase()}] — ${l.message}`;
+      terminal.appendChild(line);
+    });
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function clearLogs() {
+    if (!confirm('Clear all logs?')) return;
+    localStorage.removeItem('adminLogs');
+    document.getElementById('log-terminal').innerHTML = '<div class="log-line system">[SYSTEM] — Logs cleared</div>';
+  }
+
+  function downloadLogs() {
+    const logs = JSON.parse(localStorage.getItem('adminLogs') || '[]');
+    const text = logs.map(l => `[${l.time}] [${l.type.toUpperCase()}] — ${l.message}`).join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hyperx-logs-' + new Date().toISOString().split('T')[0] + '.txt';
+    a.click();
+  }
+
+  // ===== SETTINGS =====
+  function loadSettings() {
+    const s = JSON.parse(localStorage.getItem('paymentSettings') || '{}');
+    document.getElementById('set-upi-id').value = s.upiId || 'hyper-m-shop@ybl';
+    document.getElementById('set-crypto-addr').value = s.cryptoAddress || 'TYuG8Jp99XhsaEw1R4aN5bS3mK9q8wRt4z';
+    document.getElementById('set-whatsapp').value = s.whatsapp || '';
+  }
+
+  function savePaymentSettings(e) {
+    e.preventDefault();
+    const upiId = document.getElementById('set-upi-id').value.trim();
+    const cryptoAddress = document.getElementById('set-crypto-addr').value.trim();
+    const whatsapp = document.getElementById('set-whatsapp').value.trim();
+    const newPass = document.getElementById('set-new-pass').value;
+    const existing = JSON.parse(localStorage.getItem('paymentSettings') || '{}');
+    const data = { ...existing, upiId, cryptoAddress, whatsapp };
+    if (newPass) data.adminPassword = newPass;
+    localStorage.setItem('paymentSettings', JSON.stringify(data));
+    addLog('info', 'Payment settings updated');
+    const btn = document.querySelector('#settings-form .btn-red');
+    const orig = btn.textContent;
+    btn.textContent = '✅ SAVED!';
+    btn.style.background = '#22c55e';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+  }
+
+  // ===== ACTIVITY MONITOR =====
+  function loadMonitor() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    const today = new Date().toLocaleDateString();
+    const todayOrders = orders.filter(o => o.date && o.date.includes(today));
+    const revenue = orders.filter(o => o.status === 'Approved').reduce((sum, o) => {
+      const m = String(o.price).match(/\d+/);
+      return sum + (m ? parseFloat(m[0]) : 0);
+    }, 0);
+
+    document.getElementById('mon-users-online').textContent = users.length;
+    document.getElementById('mon-orders-today').textContent = todayOrders.length;
+    document.getElementById('mon-revenue').textContent = '₹' + revenue.toLocaleString();
+
+    // Draw bars chart
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const randomBars = days.map(d => Math.floor(Math.random() * 100) + 10);
+    const max = Math.max(...randomBars);
+    document.getElementById('chart-bar-wrap').innerHTML = days.map((d, i) => `
+      <div class="chart-bar-col">
+        <div class="chart-bar" style="height:${(randomBars[i]/max*110)+10}px;" title="${randomBars[i]} orders"></div>
+        <span class="chart-bar-label">${d}</span>
+      </div>
+    `).join('');
+  }
+
+  // Initialize
+  checkLogin();
+  // Pre-load logs from localStorage when tab opens
+  document.getElementById('tab-logs').addEventListener('click', loadLogs);
+</script>
+</body>
+</html>
