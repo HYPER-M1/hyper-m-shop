@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="db-sync.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HYPER X – Owner Panel</title>
@@ -810,6 +811,10 @@
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
           Manage Products
         </button>
+        <button class="tab-btn" id="tab-categories" onclick="switchTab('categories')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          Manage Categories
+        </button>
         <button class="tab-btn" id="tab-resellers" onclick="switchTab('resellers')">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           Resellers
@@ -1021,12 +1026,6 @@
                 <div class="form-col">
                   <label>Category</label>
                   <select class="input-sm" id="prod-category">
-                    <option value="android">Android Panel</option>
-                    <option value="pc">PC Panel</option>
-                    <option value="ff">Free Fire ID</option>
-                    <option value="mystery">Mystery Box</option>
-                    <option value="ios">iOS Panel</option>
-                    <option value="pcgame">PC Game Panel</option>
                   </select>
                 </div>
                 <div class="form-col">
@@ -1104,6 +1103,50 @@
                 <thead><tr><th>Category</th><th>Emoji</th><th>Name</th><th>Price</th><th>Stock</th><th>Features</th><th>Actions</th></tr></thead>
                 <tbody id="products-tbody">
                   <tr><td colspan="7" style="text-align:center;color:var(--gray);">No products added yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== CATEGORIES ===== -->
+        <div class="tab-content" id="content-categories">
+          <div class="section-card" style="margin-bottom:1.5rem;">
+            <div class="section-header">
+              <span class="section-title" id="cat-form-title">Add New Category</span>
+            </div>
+            <form id="category-form" onsubmit="return false">
+              <input type="hidden" id="cat-edit-index" value="-1">
+              <div class="form-row">
+                <div class="form-col">
+                  <label>Category Key (Lowercase, no spaces, e.g. "bgmi")</label>
+                  <input type="text" class="input-sm" id="cat-key" placeholder="e.g. bgmi">
+                </div>
+                <div class="form-col">
+                  <label>Category Name (Display Name, e.g. "BGMI Panel")</label>
+                  <input type="text" class="input-sm" id="cat-name" placeholder="e.g. BGMI Panel">
+                </div>
+              </div>
+              <div style="display:flex;gap:0.6rem;margin-top:0.5rem;">
+                <button class="btn-red" onclick="saveCategory()" id="cat-save-btn">SAVE CATEGORY</button>
+                <button type="button" onclick="resetCategoryForm()" style="background:var(--bg3);border:1px solid var(--border);color:var(--white);padding:0.7rem 1.2rem;border-radius:8px;font-family:var(--font-sub);font-weight:700;cursor:pointer;" id="cat-cancel-btn">CANCEL</button>
+              </div>
+            </form>
+          </div>
+          
+          <div class="section-card">
+            <div class="section-header"><span class="section-title">All Categories</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Key</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-tbody">
+                  <!-- Injected by JS -->
                 </tbody>
               </table>
             </div>
@@ -1368,6 +1411,7 @@
     users: 'User Credits',
     keys: 'Key Generator',
     products: 'Manage Products',
+    categories: 'Manage Categories',
     resellers: 'Resellers',
     withdrawals: 'Withdrawals',
     coupons: 'Coupons',
@@ -1389,6 +1433,7 @@
     if (tab === 'users')         loadUsers();
     if (tab === 'keys')          loadKeys();
     if (tab === 'products')      loadProducts();
+    if (tab === 'categories')    loadCategories();
     if (tab === 'resellers')     loadResellers();
     if (tab === 'withdrawals')   loadWithdrawals();
     if (tab === 'coupons')       loadCoupons();
@@ -1401,6 +1446,7 @@
   function loadAllData() {
     loadOverview();
     updateBadges();
+    loadCategories();
   }
 
   function updateBadges() {
@@ -1677,19 +1723,22 @@
   }
 
   // ===== PRODUCTS =====
-  const catMapFull = { android:'Android Panel', pc:'PC Panel', ff:'Free Fire ID', mystery:'Mystery Box', ios:'iOS Panel', pcgame:'PC Game Panel' };
-
   function loadProducts() {
     const products = JSON.parse(localStorage.getItem('products') || '{}');
+    const cats = getCategories();
+    const catMap = {};
+    cats.forEach(c => { catMap[c.key] = c.name; });
+
     const tbody = document.getElementById('products-tbody');
     tbody.innerHTML = '';
     let count = 0;
     Object.keys(products).forEach(cat => {
       (products[cat] || []).forEach((p, idx) => {
         count++;
+        const catName = catMap[cat] || cat.toUpperCase();
         tbody.innerHTML += `
           <tr>
-            <td><span style="color:var(--red);font-weight:700;text-transform:uppercase;">${catMapFull[cat]}</span></td>
+            <td><span style="color:var(--red);font-weight:700;text-transform:uppercase;">${catName}</span></td>
             <td style="font-size:1.2rem;">${p.emoji || '⚡'}</td>
             <td><strong>${p.name}</strong></td>
             <td style="color:var(--green);font-weight:700;">₹${p.price}</td>
@@ -1723,12 +1772,30 @@
     const editIdx  = parseInt(document.getElementById('prod-edit-index').value);
     const editCat  = document.getElementById('prod-edit-category').value;
 
-    if (!name || isNaN(price) || !stock || !emoji || !features) { alert('Please fill all required fields!'); return; }
+    if (!name || isNaN(price)) { 
+      alert('Please fill at least the Product Name and Price!'); 
+      return; 
+    }
+
+    const finalStock    = stock || 'IN STOCK';
+    const finalEmoji    = emoji || '📦';
+    const finalFeatures = features || 'Premium Access & Fast Delivery';
 
     let durationsArr = durRaw ? durRaw.split(',').map(d => d.trim()).filter(Boolean) : [];
 
     let products = JSON.parse(localStorage.getItem('products') || '{}');
-    const newProd = { name, price, stock, features, emoji, gradient, badge, image: image||'', videoUrl: videoUrl||'', durations: durationsArr };
+    const newProd = { 
+      name, 
+      price, 
+      stock: finalStock, 
+      features: finalFeatures, 
+      emoji: finalEmoji, 
+      gradient, 
+      badge, 
+      image: image||'', 
+      videoUrl: videoUrl||'', 
+      durations: durationsArr 
+    };
 
     if (editIdx === -1) {
       if (!products[category]) products[category] = [];
@@ -1744,6 +1811,7 @@
         products[category].push(newProd);
       }
       alert('Product updated!');
+      addLog('info', `Product updated: ${name}`);
     }
     localStorage.setItem('products', JSON.stringify(products));
     resetProductForm();
@@ -1756,16 +1824,16 @@
     if (!p) return;
     document.getElementById('prod-form-title').innerText = 'Edit Product: ' + p.name;
     document.getElementById('prod-category').value = category;
-    document.getElementById('prod-category').disabled = true;
+    document.getElementById('prod-category').disabled = false; // Allow changing category on edit!
     document.getElementById('prod-name').value = p.name;
     document.getElementById('prod-price').value = p.price;
-    document.getElementById('prod-stock').value = p.stock;
-    document.getElementById('prod-emoji').value = p.emoji||'';
-    document.getElementById('prod-gradient').value = p.gradient||'linear-gradient(135deg,#ff0033,#1a0000)';
-    document.getElementById('prod-badge').value = p.badge||'instock';
-    document.getElementById('prod-features').value = p.features;
-    document.getElementById('prod-image').value = p.image||'';
-    document.getElementById('prod-video').value = p.videoUrl||'';
+    document.getElementById('prod-stock').value = p.stock || '';
+    document.getElementById('prod-emoji').value = p.emoji || '';
+    document.getElementById('prod-gradient').value = p.gradient || 'linear-gradient(135deg,#ff0033,#1a0000)';
+    document.getElementById('prod-badge').value = p.badge || 'instock';
+    document.getElementById('prod-features').value = p.features || '';
+    document.getElementById('prod-image').value = p.image || '';
+    document.getElementById('prod-video').value = p.videoUrl || '';
     document.getElementById('prod-durations').value = p.durations?.join(', ') || '';
     document.getElementById('prod-edit-index').value = idx;
     document.getElementById('prod-edit-category').value = category;
@@ -2104,8 +2172,149 @@
     `).join('');
   }
 
+  // ===== CATEGORIES MANAGEMENT =====
+  const defaultCategories = [
+    { key: 'android', name: 'Android Panel' },
+    { key: 'pc', name: 'PC Panel' },
+    { key: 'ff', name: 'Free Fire ID' },
+    { key: 'mystery', name: 'Mystery Box' },
+    { key: 'ios', name: 'iOS Panel' },
+    { key: 'pcgame', name: 'PC Game Panel' }
+  ];
+
+  function getCategories() {
+    let cats = localStorage.getItem('categories');
+    if (!cats) {
+      cats = JSON.stringify(defaultCategories);
+      localStorage.setItem('categories', cats);
+    }
+    return JSON.parse(cats);
+  }
+
+  function loadCategories() {
+    const cats = getCategories();
+    
+    // 1. Populate All Categories table in Admin
+    const tbody = document.getElementById('categories-tbody');
+    if (tbody) {
+      if (cats.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--gray);">No categories defined.</td></tr>`;
+      } else {
+        tbody.innerHTML = cats.map((c, idx) => `
+          <tr>
+            <td style="font-family:monospace; color:var(--red); font-weight:700;">${c.key}</td>
+            <td style="font-weight:700;">${c.name}</td>
+            <td>
+              <div style="display:flex;gap:0.4rem;">
+                <button onclick="editCategory(${idx})" class="btn-action edit" style="background:#ffaa00;color:black;padding:4px 8px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-sub);font-weight:700;font-size:0.75rem;">Edit</button>
+                <button onclick="deleteCategory(${idx})" class="btn-action reject" style="background:#ff0033;color:white;padding:4px 8px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-sub);font-weight:700;font-size:0.75rem;">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+    
+    // 2. Populate product category dropdown inside Admin Product Form
+    const prodCategorySelect = document.getElementById('prod-category');
+    if (prodCategorySelect) {
+      prodCategorySelect.innerHTML = cats.map(c => `<option value="${c.key}">${c.name}</option>`).join('');
+    }
+  }
+
+  function saveCategory() {
+    const keyInput = document.getElementById('cat-key');
+    const nameInput = document.getElementById('cat-name');
+    const editIdx = parseInt(document.getElementById('cat-edit-index').value);
+    
+    const key = keyInput.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const name = nameInput.value.trim();
+    
+    if (!key || !name) {
+      alert('Please enter Category Key and Name!');
+      return;
+    }
+    
+    let cats = getCategories();
+    
+    if (editIdx === -1) {
+      // Check for duplicate key
+      if (cats.some(c => c.key === key)) {
+        alert('Category key already exists! Please use a unique key.');
+        return;
+      }
+      cats.push({ key, name });
+    } else {
+      const oldKey = cats[editIdx].key;
+      // Check for duplicate key excluding current index
+      if (cats.some((c, i) => c.key === key && i !== editIdx)) {
+        alert('Category key already exists! Please use a unique key.');
+        return;
+      }
+      
+      cats[editIdx] = { key, name };
+      
+      // Update key in products object if key changed
+      if (oldKey !== key) {
+        let products = JSON.parse(localStorage.getItem('products') || '{}');
+        if (products[oldKey]) {
+          products[key] = products[oldKey];
+          delete products[oldKey];
+          localStorage.setItem('products', JSON.stringify(products));
+        }
+      }
+    }
+    
+    localStorage.setItem('categories', JSON.stringify(cats));
+    resetCategoryForm();
+    loadCategories();
+    loadProducts(); // Refresh products list/filter
+  }
+
+  function editCategory(idx) {
+    const cats = getCategories();
+    const c = cats[idx];
+    if (!c) return;
+    
+    document.getElementById('cat-form-title').innerText = 'Edit Category: ' + c.name;
+    document.getElementById('cat-key').value = c.key;
+    document.getElementById('cat-name').value = c.name;
+    document.getElementById('cat-edit-index').value = idx;
+    document.getElementById('cat-save-btn').innerText = 'UPDATE CATEGORY';
+  }
+
+  function deleteCategory(idx) {
+    let cats = getCategories();
+    const c = cats[idx];
+    if (!c) return;
+    
+    if (!confirm(`Are you sure you want to delete category "${c.name}"?\nAny products inside this category will also be deleted!`)) {
+      return;
+    }
+    
+    // Remove category key from products list
+    let products = JSON.parse(localStorage.getItem('products') || '{}');
+    if (products[c.key]) {
+      delete products[c.key];
+      localStorage.setItem('products', JSON.stringify(products));
+    }
+    
+    cats.splice(idx, 1);
+    localStorage.setItem('categories', JSON.stringify(cats));
+    loadCategories();
+    loadProducts();
+  }
+
+  function resetCategoryForm() {
+    document.getElementById('category-form').reset();
+    document.getElementById('cat-edit-index').value = '-1';
+    document.getElementById('cat-form-title').innerText = 'Add New Category';
+    document.getElementById('cat-save-btn').innerText = 'SAVE CATEGORY';
+  }
+
   // Initialize
   checkLogin();
+  loadCategories();
   // Pre-load logs from localStorage when tab opens
   document.getElementById('tab-logs').addEventListener('click', loadLogs);
 </script>

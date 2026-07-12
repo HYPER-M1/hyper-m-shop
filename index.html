@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="db-sync.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HYPER X – Premium Gaming Panel Store</title>
@@ -33,13 +34,8 @@
       </a>
 
       <!-- Center Desktop Nav Links -->
-      <div class="desktop-nav-links">
-        <a href="#home" class="desktop-nav-link active">HOME</a>
-        <a href="#android" class="desktop-nav-link">ANDROID PANEL</a>
-        <a href="#pc" class="desktop-nav-link">PC PANEL</a>
-        <a href="#ios" class="desktop-nav-link">IOS PANEL</a>
-        <a href="#freefireid" class="desktop-nav-link">FREE FIRE ID</a>
-        <a href="#mystery" class="desktop-nav-link">MYSTERY BOX</a>
+      <div class="desktop-nav-links" id="desktop-nav-container">
+        <!-- Dynamic links -->
       </div>
 
       <!-- Right Actions (Cart, Auth, Hamburger) -->
@@ -66,25 +62,14 @@
 
     <!-- Mobile Navigation Drawer -->
     <div id="nav-links" class="mobile-nav-drawer">
-      <a href="#home" class="mobile-nav-link active" onclick="document.getElementById('nav-links').classList.remove('open')">HOME</a>
-      <a href="#android" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">ANDROID PANEL</a>
-      <a href="#pc" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">PC PANEL</a>
-      <a href="#ios" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">IOS PANEL</a>
-      <a href="#freefireid" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">FREE FIRE ID</a>
-      <a href="#mystery" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">MYSTERY BOX</a>
+      <!-- Dynamic links -->
     </div>
 
     <!-- Sub-navigation Row (Only visible on mobile/tablet) -->
     <div class="sub-header-row">
       <div class="sub-header-container">
-        <ul class="sub-nav-links">
-          <li><a href="#home" class="sub-nav-link active">Home</a></li>
-          <li><a href="#android" class="sub-nav-link">Android Panel</a></li>
-          <li><a href="#pc" class="sub-nav-link">PC Panel</a></li>
-          <li><a href="#ios" class="sub-nav-link">iOS Panel</a></li>
-          <li><a href="#freefireid" class="sub-nav-link">Free Fire ID</a></li>
-          <li><a href="#mystery" class="sub-nav-link">Mystery Box</a></li>
-          <li><a href="#pcgame" class="sub-nav-link">PC Game Panel</a></li>
+        <ul class="sub-nav-links" id="sub-nav-container">
+          <!-- Dynamic links -->
         </ul>
       </div>
     </div>
@@ -165,41 +150,8 @@
     </div>
   </section>
 
-  <!-- ANDROID PANEL -->
-  <section class="sec" id="android">
-    <div class="sec-header"><span class="slash">/</span><h2>ANDROID PANEL</h2></div>
-    <div class="grid" id="android-grid"></div>
-  </section>
-
-  <!-- PC PANEL -->
-  <section class="sec" id="pc">
-    <div class="sec-header"><span class="slash">/</span><h2>PC PANEL</h2></div>
-    <div class="grid" id="pc-grid"></div>
-  </section>
-
-  <!-- IOS PANEL -->
-  <section class="sec" id="ios">
-    <div class="sec-header"><span class="slash">/</span><h2>iOS PANEL</h2></div>
-    <div class="grid" id="ios-grid"></div>
-  </section>
-
-  <!-- FREE FIRE ID -->
-  <section class="sec" id="freefireid">
-    <div class="sec-header"><span class="slash">/</span><h2>FREE FIRE ID</h2></div>
-    <div class="grid" id="ff-grid"></div>
-  </section>
-
-  <!-- MYSTERY BOX -->
-  <section class="sec" id="mystery">
-    <div class="sec-header"><span class="slash">/</span><h2>MYSTERY BOX</h2></div>
-    <div class="grid" id="mystery-grid"></div>
-  </section>
-
-  <!-- PC GAME PANEL -->
-  <section class="sec" id="pcgame">
-    <div class="sec-header"><span class="slash">/</span><h2>PC GAME PANEL</h2></div>
-    <div class="grid" id="pcgame-grid"></div>
-  </section>
+  <!-- DYNAMIC CATALOG SECTIONS -->
+  <div id="storefront-sections-container"></div>
 
   <!-- PAYMENT IS REDIRECTED TO PAYMENT.HTML -->
 
@@ -367,14 +319,8 @@
           <a href="https://t.me/hyperm" target="_blank">Telegram</a>
         </div>
       </div>
-      <div class="footer-col">
-        <h4>Products</h4>
-        <a href="#android">Android Panel</a>
-        <a href="#pc">PC Panel</a>
-        <a href="#freefireid">Free Fire ID</a>
-        <a href="#mystery">Mystery Box</a>
-        <a href="#ios">iOS Panel</a>
-        <a href="#pcgame">PC Game Panel</a>
+      <div class="footer-col" id="footer-products-container">
+        <!-- Dynamic footer links -->
       </div>
       <div class="footer-col">
         <h4>Support</h4>

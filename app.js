@@ -96,30 +96,86 @@ function makeCard(p) {
           <button class="view-details-btn" onclick="viewDetails(decodeURIComponent('${pEncoded}'))">VIEW DETAILS</button>
         </div>
       </div>
-      <div class="card-body">
-        <div class="card-name">${p.name}</div>
-        <div class="card-features">📄 ${p.features}</div>
-        <div class="card-footer">
-          <div class="card-price"><span>&#8377;</span>${p.price}.00</div>
-          <button class="buy-btn" onclick="buyNow('${p.name}',${p.price},'${durEncoded}')">BUY NOW</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-
 function renderGrid(id, items) {
   const el = document.getElementById(id);
   if (el) el.innerHTML = (items || []).map(makeCard).join('');
 }
 
-renderGrid('android-grid', products.android);
-renderGrid('pc-grid', products.pc);
-renderGrid('ff-grid', products.ff);
-renderGrid('mystery-grid', products.mystery);
-renderGrid('ios-grid', products.ios);
-renderGrid('pcgame-grid', products.pcgame);
+const defaultCategories = [
+  { key: 'android', name: 'Android Panel' },
+  { key: 'pc', name: 'PC Panel' },
+  { key: 'ff', name: 'Free Fire ID' },
+  { key: 'mystery', name: 'Mystery Box' },
+  { key: 'ios', name: 'iOS Panel' },
+  { key: 'pcgame', name: 'PC Game Panel' }
+];
+
+function getCategories() {
+  let cats = localStorage.getItem('categories');
+  if (!cats) {
+    cats = JSON.stringify(defaultCategories);
+    localStorage.setItem('categories', cats);
+  }
+  return JSON.parse(cats);
+}
+
+function renderStorefrontLayout() {
+  const cats = getCategories();
+  
+  // Render Desktop Navigation Links
+  const desktopNav = document.getElementById('desktop-nav-container');
+  if (desktopNav) {
+    desktopNav.innerHTML = `<a href="#home" class="desktop-nav-link active">HOME</a>` +
+      cats.map(c => `<a href="#${c.key}" class="desktop-nav-link">${c.name.toUpperCase()}</a>`).join('');
+  }
+
+  // Render Mobile Navigation Drawer Links
+  const mobileNav = document.getElementById('nav-links');
+  if (mobileNav) {
+    mobileNav.innerHTML = `<a href="#home" class="mobile-nav-link active" onclick="document.getElementById('nav-links').classList.remove('open')">HOME</a>` +
+      cats.map(c => `<a href="#${c.key}" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">${c.name.toUpperCase()}</a>`).join('');
+  }
+
+  // Render Mobile Sub-navigation Row
+  const subNav = document.getElementById('sub-nav-container');
+  if (subNav) {
+    subNav.innerHTML = `<li><a href="#home" class="sub-nav-link active">Home</a></li>` +
+      cats.map(c => `<li><a href="#${c.key}" class="sub-nav-link">${c.name}</a></li>`).join('');
+  }
+
+  // Render Dynamic Catalog Sections
+  const sectionsContainer = document.getElementById('storefront-sections-container');
+  if (sectionsContainer) {
+    sectionsContainer.innerHTML = cats.map(c => `
+      <section class="sec" id="${c.key}">
+        <div class="sec-header"><span class="slash">/</span><h2>${c.name.toUpperCase()}</h2></div>
+        <div class="grid" id="${c.key}-grid"></div>
+      </section>
+    `).join('');
+  }
+
+  // Render Footer Products Links
+  const footerProducts = document.getElementById('footer-products-container');
+  if (footerProducts) {
+    footerProducts.innerHTML = `<h4>Products</h4>` +
+      cats.map(c => `<a href="#${c.key}">${c.name}</a>`).join('');
+  }
+
+  // Render grids with products
+  let allProds = {};
+  try {
+    allProds = JSON.parse(localStorage.getItem('products')) || products;
+  } catch (e) {
+    allProds = products;
+  }
+  
+  cats.forEach(c => {
+    renderGrid(`${c.key}-grid`, allProds[c.key]);
+  });
+}
+
+// Render storefront layout on load
+renderStorefrontLayout();
 
 // ===== SEARCH FILTER =====
 function filterStorefrontProducts(query) {
@@ -131,20 +187,13 @@ function filterStorefrontProducts(query) {
     allProds = defaultProducts;
   }
 
-  const categorySectionIds = {
-    android: 'android',
-    pc: 'pc',
-    ff: 'freefireid',
-    mystery: 'mystery',
-    ios: 'ios',
-    pcgame: 'pcgame'
-  };
+  const cats = getCategories();
   
-  Object.keys(categorySectionIds).forEach(cat => {
-    const grid = document.getElementById(cat + '-grid');
-    const sec = document.getElementById(categorySectionIds[cat]);
+  cats.forEach(c => {
+    const grid = document.getElementById(c.key + '-grid');
+    const sec = document.getElementById(c.key);
     if (!grid) return;
-    const items = allProds[cat] || [];
+    const items = allProds[c.key] || [];
     
     let filtered = items;
     if (q) {
@@ -154,7 +203,7 @@ function filterStorefrontProducts(query) {
       );
     }
     
-    renderGrid(cat + '-grid', filtered);
+    renderGrid(c.key + '-grid', filtered);
     
     if (sec) {
       if (filtered.length === 0) {
@@ -164,7 +213,7 @@ function filterStorefrontProducts(query) {
       }
     }
   });
-}
+
 
 // ===== VIEW DETAILS MODAL =====
 let detailProduct = null;
@@ -450,7 +499,8 @@ function saveQuickEdit() {
   // Update the product in localStorage
   const products = JSON.parse(localStorage.getItem('products') || '{}');
   let updated = false;
-  ['android','pc','ff','mystery','ios','pcgame'].forEach(cat => {
+  getCategories().forEach(c => {
+    const cat = c.key;
     if (products[cat]) {
       products[cat] = products[cat].map(prod => {
         if (prod.name === p.name && prod.price === p.price) {
@@ -512,12 +562,9 @@ function saveQuickEdit() {
 
     // Re-render all grids to reflect changes
     const allProds = JSON.parse(localStorage.getItem('products') || '{}');
-    renderGrid('android-grid', allProds.android);
-    renderGrid('pc-grid', allProds.pc);
-    renderGrid('ff-grid', allProds.ff);
-    renderGrid('mystery-grid', allProds.mystery);
-    renderGrid('ios-grid', allProds.ios);
-    renderGrid('pcgame-grid', allProds.pcgame);
+    getCategories().forEach(c => {
+      renderGrid(c.key + '-grid', allProds[c.key]);
+    });
 
     // Flash success
     const btn = document.querySelector('[onclick="saveQuickEdit()"]');
