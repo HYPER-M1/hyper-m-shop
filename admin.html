@@ -7,6 +7,7 @@
   <title>HYPER X – Owner Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="db-sync.js" as="script">
   <style>
     :root {
       --red: #E50914;
@@ -27,7 +28,17 @@
       --accent-grad: linear-gradient(135deg, #E50914 0%, #B20710 100%);
     }
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      touch-action: manipulation;
+    }
 
     body {
       background: var(--bg);
@@ -53,6 +64,9 @@
       padding: 3rem 2.5rem;
       width: 100%; max-width: 420px;
       box-shadow: 0 0 60px rgba(255,0,51,0.15), 0 24px 48px rgba(0,0,0,0.6);
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
 
     .login-brand {
@@ -812,8 +826,8 @@
           Manage Products
         </button>
         <button class="tab-btn" id="tab-categories" onclick="switchTab('categories')">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-          Manage Categories
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16"/></svg>
+          Manage Slots / Cats
         </button>
         <button class="tab-btn" id="tab-resellers" onclick="switchTab('resellers')">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -1026,6 +1040,12 @@
                 <div class="form-col">
                   <label>Category</label>
                   <select class="input-sm" id="prod-category">
+                    <option value="android">Android Panel</option>
+                    <option value="pc">PC Panel</option>
+                    <option value="ff">Free Fire ID</option>
+                    <option value="mystery">Mystery Box</option>
+                    <option value="ios">iOS Panel</option>
+                    <option value="pcgame">PC Game Panel</option>
                   </select>
                 </div>
                 <div class="form-col">
@@ -1109,44 +1129,37 @@
           </div>
         </div>
 
-        <!-- ===== CATEGORIES ===== -->
+        <!-- ===== MANAGE CATEGORIES ===== -->
         <div class="tab-content" id="content-categories">
           <div class="section-card" style="margin-bottom:1.5rem;">
-            <div class="section-header">
-              <span class="section-title" id="cat-form-title">Add New Category</span>
+            <div class="section-header"><span class="section-title">Add New Category / Slot</span></div>
+            <div class="form-row">
+              <div class="form-col">
+                <label>Category ID (e.g. android, pc, bgmi)</label>
+                <input type="text" class="input-sm" id="cat-id" placeholder="e.g. bgmi">
+              </div>
+              <div class="form-col">
+                <label>Category Display Name</label>
+                <input type="text" class="input-sm" id="cat-name" placeholder="e.g. BGMI Panel">
+              </div>
             </div>
-            <form id="category-form" onsubmit="return false">
-              <input type="hidden" id="cat-edit-index" value="-1">
-              <div class="form-row">
-                <div class="form-col">
-                  <label>Category Key (Lowercase, no spaces, e.g. "bgmi")</label>
-                  <input type="text" class="input-sm" id="cat-key" placeholder="e.g. bgmi">
-                </div>
-                <div class="form-col">
-                  <label>Category Name (Display Name, e.g. "BGMI Panel")</label>
-                  <input type="text" class="input-sm" id="cat-name" placeholder="e.g. BGMI Panel">
-                </div>
-              </div>
-              <div style="display:flex;gap:0.6rem;margin-top:0.5rem;">
-                <button class="btn-red" onclick="saveCategory()" id="cat-save-btn">SAVE CATEGORY</button>
-                <button type="button" onclick="resetCategoryForm()" style="background:var(--bg3);border:1px solid var(--border);color:var(--white);padding:0.7rem 1.2rem;border-radius:8px;font-family:var(--font-sub);font-weight:700;cursor:pointer;" id="cat-cancel-btn">CANCEL</button>
-              </div>
-            </form>
+            <div style="margin-top:1rem;">
+              <button class="btn-red" onclick="addCategory()">ADD CATEGORY</button>
+            </div>
           </div>
-          
           <div class="section-card">
-            <div class="section-header"><span class="section-title">All Categories</span></div>
+            <div class="section-header"><span class="section-title">All Categories / Slots</span></div>
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Key</th>
-                    <th>Name</th>
+                    <th>Category ID</th>
+                    <th>Display Name</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="categories-tbody">
-                  <!-- Injected by JS -->
+                  <tr><td colspan="3" style="text-align:center;color:var(--gray);">Loading...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1411,7 +1424,7 @@
     users: 'User Credits',
     keys: 'Key Generator',
     products: 'Manage Products',
-    categories: 'Manage Categories',
+    categories: 'Manage Categories & Slots',
     resellers: 'Resellers',
     withdrawals: 'Withdrawals',
     coupons: 'Coupons',
@@ -1444,9 +1457,9 @@
 
   // ===== LOAD ALL DATA =====
   function loadAllData() {
+    loadCategories(); // Always load categories first to fill product options
     loadOverview();
     updateBadges();
-    loadCategories();
   }
 
   function updateBadges() {
@@ -1528,8 +1541,6 @@
     let orders = JSON.parse(localStorage.getItem('orders') || '[]');
     const idx = orders.findIndex(o => o.id === orderId);
     if (idx === -1) return;
-    orders[idx].status = newStatus;
-    localStorage.setItem('orders', JSON.stringify(orders));
 
     if (newStatus === 'Approved') {
       const isWalletFunds = orders[idx].product.includes('WALLET_FUNDS');
@@ -1544,36 +1555,51 @@
             const currentBal = parseFloat(users[userIdx].balance) || 0;
             users[userIdx].balance = currentBal + amount;
             localStorage.setItem('users', JSON.stringify(users));
+            orders[idx].status = 'Approved';
+            localStorage.setItem('orders', JSON.stringify(orders));
             alert(`Order ${orderId} Approved!\nAdded ₹${amount} credit to user ${buyerUsername}.`);
+            addLog('info', `Order ${orderId} approved by admin (Wallet credit)`);
           }
         }
       } else {
+        // Try to allocate an existing key that matches the product name and duration
         let keys = JSON.parse(localStorage.getItem('keys') || '[]');
-        const keyIdx = keys.findIndex(k => k.product === orders[idx].product && k.status === 'Unused');
-        let allocatedKey = '';
+        const keyIdx = keys.findIndex(k => 
+          k.product === orders[idx].product && 
+          k.status === 'Unused' && 
+          k.duration === orders[idx].duration
+        );
+        
         if (keyIdx !== -1) {
           keys[keyIdx].status = 'Used';
           keys[keyIdx].assignedTo = orders[idx].username || orders[idx].contact || 'Guest';
           keys[keyIdx].orderId = orderId;
           keys[keyIdx].useDate = new Date().toLocaleDateString();
-          allocatedKey = keys[keyIdx].key;
+          const allocatedKey = keys[keyIdx].key;
           localStorage.setItem('keys', JSON.stringify(keys));
+          
+          orders[idx].status = 'Approved';
+          localStorage.setItem('orders', JSON.stringify(orders));
+          
+          const buyerUsername = orders[idx].username;
+          if (buyerUsername && buyerUsername !== 'Guest') {
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const uIdx = users.findIndex(u => u.username === buyerUsername);
+            if (uIdx !== -1) { 
+              users[uIdx].keysClaimed = (users[uIdx].keysClaimed || 0) + 1; 
+              localStorage.setItem('users', JSON.stringify(users)); 
+            }
+          }
           alert(`Order ${orderId} Approved!\nKey allocated: ${allocatedKey}`);
+          addLog('info', `Order ${orderId} approved by admin (Key allocated)`);
         } else {
-          allocatedKey = generateRandomKey();
-          keys.push({ key: allocatedKey, product: orders[idx].product, duration: '30 Days', date: new Date().toLocaleDateString(), status: 'Used', assignedTo: orders[idx].username || 'Guest', orderId, useDate: new Date().toLocaleDateString() });
-          localStorage.setItem('keys', JSON.stringify(keys));
-          alert(`Order ${orderId} Approved!\nAuto-generated key: ${allocatedKey}`);
-        }
-        const buyerUsername = orders[idx].username;
-        if (buyerUsername && buyerUsername !== 'Guest') {
-          let users = JSON.parse(localStorage.getItem('users') || '[]');
-          const uIdx = users.findIndex(u => u.username === buyerUsername);
-          if (uIdx !== -1) { users[uIdx].keysClaimed = (users[uIdx].keysClaimed || 0) + 1; localStorage.setItem('users', JSON.stringify(users)); }
+          alert(`❌ Order ${orderId} cannot be approved!\n\nNo unused key found for "${orders[idx].product}" with duration "${orders[idx].duration}".\n\nPlease add a matching key in the Key Generator first!`);
+          return; // Stop here, do not approve the order!
         }
       }
-      addLog('info', `Order ${orderId} approved by admin`);
     } else {
+      orders[idx].status = newStatus;
+      localStorage.setItem('orders', JSON.stringify(orders));
       alert(`Order ${orderId} Rejected.`);
       addLog('warn', `Order ${orderId} rejected by admin`);
     }
@@ -1647,13 +1673,13 @@
     // Populate product select
     keyProdSelect.innerHTML = '';
     let hasProducts = false;
-    const catMap = { android:'Android Panel', pc:'PC Panel', ff:'Free Fire ID', mystery:'Mystery Box', ios:'iOS Panel', pcgame:'PC Game Panel' };
+    const catMap = getCatMapFull();
     Object.keys(products).forEach(cat => {
       (products[cat] || []).forEach(p => {
         hasProducts = true;
         const opt = document.createElement('option');
         opt.value = p.name;
-        opt.innerText = `${p.name} (${catMap[cat]})`;
+        opt.innerText = `${p.name} (${catMap[cat] || cat})`;
         keyProdSelect.appendChild(opt);
       });
     });
@@ -1722,23 +1748,128 @@
     loadKeys();
   }
 
-  // ===== PRODUCTS =====
+  // ===== CATEGORIES & PRODUCTS =====
+  function getCatMapFull() {
+    const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+    const map = {};
+    categories.forEach(cat => {
+      map[cat.id] = cat.name;
+    });
+    return map;
+  }
+
+  function loadCategories() {
+    const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+    const tbody = document.getElementById('categories-tbody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      categories.forEach((cat, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td><code>${cat.id}</code></td>
+            <td><strong>${cat.name}</strong></td>
+            <td>
+              <button class="btn-action edit" onclick="editCategoryName(${idx})">Edit Name</button>
+              <button class="btn-action reject" onclick="deleteCategory(${idx})">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+      if (categories.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--gray);">No categories.</td></tr>';
+      }
+    }
+    
+    updateCategoryDropdowns();
+  }
+
+  function updateCategoryDropdowns() {
+    const select = document.getElementById('prod-category');
+    if (select) {
+      const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+      select.innerHTML = categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+    }
+  }
+
+  function addCategory() {
+    const id = document.getElementById('cat-id').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const name = document.getElementById('cat-name').value.trim();
+    if (!id || !name) {
+      alert('Please enter Category ID and Name!');
+      return;
+    }
+
+    let categories = JSON.parse(localStorage.getItem('categories') || '[]');
+    if (categories.find(c => c.id === id)) {
+      alert('Category with this ID already exists!');
+      return;
+    }
+
+    categories.push({ id, name });
+    localStorage.setItem('categories', JSON.stringify(categories));
+    
+    let products = JSON.parse(localStorage.getItem('products') || '{}');
+    if (!products[id]) {
+      products[id] = [];
+      localStorage.setItem('products', JSON.stringify(products));
+    }
+
+    document.getElementById('cat-id').value = '';
+    document.getElementById('cat-name').value = '';
+    alert('Category added successfully!');
+    addLog('info', `New category added: ${name} (${id})`);
+    loadCategories();
+    loadProducts();
+  }
+
+  function editCategoryName(idx) {
+    let categories = JSON.parse(localStorage.getItem('categories') || '[]');
+    const cat = categories[idx];
+    if (!cat) return;
+    const newName = prompt('Enter new display name for category:', cat.name);
+    if (newName && newName.trim()) {
+      cat.name = newName.trim();
+      categories[idx] = cat;
+      localStorage.setItem('categories', JSON.stringify(categories));
+      alert('Category updated!');
+      addLog('info', `Category renamed to: ${newName.trim()}`);
+      loadCategories();
+      loadProducts();
+    }
+  }
+
+  function deleteCategory(idx) {
+    let categories = JSON.parse(localStorage.getItem('categories') || '[]');
+    const cat = categories[idx];
+    if (!cat) return;
+    if (!confirm(`Are you sure you want to delete category "${cat.name}"? This will also delete ALL products inside this category!`)) return;
+
+    categories.splice(idx, 1);
+    localStorage.setItem('categories', JSON.stringify(categories));
+
+    let products = JSON.parse(localStorage.getItem('products') || '{}');
+    delete products[cat.id];
+    localStorage.setItem('products', JSON.stringify(products));
+
+    alert('Category deleted!');
+    addLog('warning', `Category deleted: ${cat.name} (${cat.id})`);
+    loadCategories();
+    loadProducts();
+  }
+
   function loadProducts() {
     const products = JSON.parse(localStorage.getItem('products') || '{}');
-    const cats = getCategories();
-    const catMap = {};
-    cats.forEach(c => { catMap[c.key] = c.name; });
-
     const tbody = document.getElementById('products-tbody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     let count = 0;
+    const catMapFull = getCatMapFull();
     Object.keys(products).forEach(cat => {
       (products[cat] || []).forEach((p, idx) => {
         count++;
-        const catName = catMap[cat] || cat.toUpperCase();
         tbody.innerHTML += `
           <tr>
-            <td><span style="color:var(--red);font-weight:700;text-transform:uppercase;">${catName}</span></td>
+            <td><span style="color:var(--red);font-weight:700;text-transform:uppercase;">${catMapFull[cat] || cat}</span></td>
             <td style="font-size:1.2rem;">${p.emoji || '⚡'}</td>
             <td><strong>${p.name}</strong></td>
             <td style="color:var(--green);font-weight:700;">₹${p.price}</td>
@@ -2172,151 +2303,22 @@
     `).join('');
   }
 
-  // ===== CATEGORIES MANAGEMENT =====
-  const defaultCategories = [
-    { key: 'android', name: 'Android Panel' },
-    { key: 'pc', name: 'PC Panel' },
-    { key: 'ff', name: 'Free Fire ID' },
-    { key: 'mystery', name: 'Mystery Box' },
-    { key: 'ios', name: 'iOS Panel' },
-    { key: 'pcgame', name: 'PC Game Panel' }
-  ];
-
-  function getCategories() {
-    let cats = localStorage.getItem('categories');
-    if (!cats) {
-      cats = JSON.stringify(defaultCategories);
-      localStorage.setItem('categories', cats);
-    }
-    return JSON.parse(cats);
-  }
-
-  function loadCategories() {
-    const cats = getCategories();
-    
-    // 1. Populate All Categories table in Admin
-    const tbody = document.getElementById('categories-tbody');
-    if (tbody) {
-      if (cats.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--gray);">No categories defined.</td></tr>`;
-      } else {
-        tbody.innerHTML = cats.map((c, idx) => `
-          <tr>
-            <td style="font-family:monospace; color:var(--red); font-weight:700;">${c.key}</td>
-            <td style="font-weight:700;">${c.name}</td>
-            <td>
-              <div style="display:flex;gap:0.4rem;">
-                <button onclick="editCategory(${idx})" class="btn-action edit" style="background:#ffaa00;color:black;padding:4px 8px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-sub);font-weight:700;font-size:0.75rem;">Edit</button>
-                <button onclick="deleteCategory(${idx})" class="btn-action reject" style="background:#ff0033;color:white;padding:4px 8px;border-radius:4px;border:none;cursor:pointer;font-family:var(--font-sub);font-weight:700;font-size:0.75rem;">Delete</button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
-      }
-    }
-    
-    // 2. Populate product category dropdown inside Admin Product Form
-    const prodCategorySelect = document.getElementById('prod-category');
-    if (prodCategorySelect) {
-      prodCategorySelect.innerHTML = cats.map(c => `<option value="${c.key}">${c.name}</option>`).join('');
-    }
-  }
-
-  function saveCategory() {
-    const keyInput = document.getElementById('cat-key');
-    const nameInput = document.getElementById('cat-name');
-    const editIdx = parseInt(document.getElementById('cat-edit-index').value);
-    
-    const key = keyInput.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    const name = nameInput.value.trim();
-    
-    if (!key || !name) {
-      alert('Please enter Category Key and Name!');
-      return;
-    }
-    
-    let cats = getCategories();
-    
-    if (editIdx === -1) {
-      // Check for duplicate key
-      if (cats.some(c => c.key === key)) {
-        alert('Category key already exists! Please use a unique key.');
-        return;
-      }
-      cats.push({ key, name });
-    } else {
-      const oldKey = cats[editIdx].key;
-      // Check for duplicate key excluding current index
-      if (cats.some((c, i) => c.key === key && i !== editIdx)) {
-        alert('Category key already exists! Please use a unique key.');
-        return;
-      }
-      
-      cats[editIdx] = { key, name };
-      
-      // Update key in products object if key changed
-      if (oldKey !== key) {
-        let products = JSON.parse(localStorage.getItem('products') || '{}');
-        if (products[oldKey]) {
-          products[key] = products[oldKey];
-          delete products[oldKey];
-          localStorage.setItem('products', JSON.stringify(products));
-        }
-      }
-    }
-    
-    localStorage.setItem('categories', JSON.stringify(cats));
-    resetCategoryForm();
-    loadCategories();
-    loadProducts(); // Refresh products list/filter
-  }
-
-  function editCategory(idx) {
-    const cats = getCategories();
-    const c = cats[idx];
-    if (!c) return;
-    
-    document.getElementById('cat-form-title').innerText = 'Edit Category: ' + c.name;
-    document.getElementById('cat-key').value = c.key;
-    document.getElementById('cat-name').value = c.name;
-    document.getElementById('cat-edit-index').value = idx;
-    document.getElementById('cat-save-btn').innerText = 'UPDATE CATEGORY';
-  }
-
-  function deleteCategory(idx) {
-    let cats = getCategories();
-    const c = cats[idx];
-    if (!c) return;
-    
-    if (!confirm(`Are you sure you want to delete category "${c.name}"?\nAny products inside this category will also be deleted!`)) {
-      return;
-    }
-    
-    // Remove category key from products list
-    let products = JSON.parse(localStorage.getItem('products') || '{}');
-    if (products[c.key]) {
-      delete products[c.key];
-      localStorage.setItem('products', JSON.stringify(products));
-    }
-    
-    cats.splice(idx, 1);
-    localStorage.setItem('categories', JSON.stringify(cats));
-    loadCategories();
-    loadProducts();
-  }
-
-  function resetCategoryForm() {
-    document.getElementById('category-form').reset();
-    document.getElementById('cat-edit-index').value = '-1';
-    document.getElementById('cat-form-title').innerText = 'Add New Category';
-    document.getElementById('cat-save-btn').innerText = 'SAVE CATEGORY';
-  }
-
   // Initialize
   checkLogin();
-  loadCategories();
   // Pre-load logs from localStorage when tab opens
   document.getElementById('tab-logs').addEventListener('click', loadLogs);
+
+  // Listen to database update events from sync engine to dynamically update active tab view
+  window.addEventListener('db-updated', () => {
+    try {
+      const activeTabBtn = document.querySelector('.tab-btn.active');
+      if (activeTabBtn) {
+        const tabId = activeTabBtn.id.replace('tab-', '');
+        switchTab(tabId);
+      }
+    } catch(e) {}
+  });
 </script>
+<script src="interactions.js" defer></script>
 </body>
 </html>

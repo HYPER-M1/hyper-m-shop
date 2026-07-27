@@ -8,6 +8,7 @@
   <meta name="description" content="Create your secure HYPER X gaming account. Access premium gaming panels, mod menus and exclusive tools.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="db-sync.js" as="script">
   <style>
     :root {
       --red: #E50914;
@@ -27,7 +28,17 @@
       --accent-grad: linear-gradient(135deg, #E50914 0%, #B20710 100%);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      touch-action: manipulation;
+    }
 
     body {
       font-family: var(--font);
@@ -120,6 +131,10 @@
         0 0 100px rgba(255,0,51,0.06),
         inset 0 1px 0 rgba(255,255,255,0.04);
       animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform, opacity;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
 
     @keyframes cardIn {
@@ -458,11 +473,8 @@
 
   <!-- GLOBAL VIDEO BACKGROUND -->
   <div class="hero-video-container">
-    <video id="bg-video-1" class="bg-video-el active" autoplay loop muted playsinline preload="auto">
-      <source src="bg-video.mp4" type="video/mp4">
-    </video>
-    <video id="bg-video-2" class="bg-video-el" autoplay loop muted playsinline preload="auto">
-      <source src="bg-video.mp4" type="video/mp4">
+    <video id="neural-bg-video" class="bg-video-el active" autoplay loop muted playsinline preload="auto">
+      <source src="assets/video/video_1781212813.mp4" type="video/mp4">
     </video>
     <div class="hero-video-overlay"></div>
   </div>
@@ -652,7 +664,7 @@
         localStorage.setItem('adminLoggedIn', 'true');
         localStorage.setItem('currentUser', ADMIN_USER);
         showSuccess('✅ Admin login successful! Redirecting...');
-        setTimeout(() => { window.location.href = 'admin.html'; }, 800);
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
         return;
       }
 
@@ -666,7 +678,7 @@
       if (user) {
         localStorage.setItem('currentUser', user.username);
         showSuccess(`✅ Welcome back, ${user.username}! Redirecting...`);
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
       } else {
         showError('❌ Invalid username or password!');
       }
@@ -729,18 +741,14 @@
       }
 
       showSuccess(`🎉 Account created! Welcome, ${username}!`);
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+      setTimeout(() => { window.location.href = 'index.html'; }, 1000);
     }
 
     // ===== AUTO-REDIRECT IF ALREADY LOGGED IN =====
     (function() {
       const currentUser = localStorage.getItem('currentUser');
       if (currentUser) {
-        if (localStorage.getItem('adminLoggedIn') === 'true' && currentUser.toLowerCase() === ADMIN_USER) {
-          window.location.href = 'admin.html';
-        } else {
-          window.location.href = 'dashboard.html';
-        }
+        window.location.href = 'index.html';
       }
     })();
 
@@ -750,7 +758,7 @@
       toggleMode('signin');
     }
   </script>
-  <script src="interactions.js"></script>
-  <script src="bg-video-loader.js"></script>
+  <script src="interactions.js" defer></script>
+  <script src="bg-video-loader.js" defer></script>
 </body>
 </html>

@@ -7,6 +7,7 @@
   <title>SecurePay – Secure Checkout Gateway</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="db-sync.js" as="script">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     :root {
@@ -33,7 +34,17 @@
       --topbar-bg: #0F0F0F;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      touch-action: manipulation;
+    }
 
     body {
       background: var(--bg);
@@ -975,81 +986,104 @@
         return;
       }
       
-      const rzpKey = settings.razorpayKey || 'rzp_test_t1jX5P9m5L4wQ2'; // test key fallback
       const amtInPaise = Math.round(selectedDurationObj.price * 100);
       const currentUser = localStorage.getItem('currentUser') || 'Guest';
 
-      const options = {
-        "key": rzpKey,
-        "amount": amtInPaise,
-        "currency": "INR",
-        "name": "HYPER X OFFICIAL",
-        "description": `${prodName} - ${selectedDurationObj.name}`,
-        "image": "https://cdn-icons-png.flaticon.com/512/3408/3408474.png",
-        "handler": function (response) {
-          const rzpPaymentId = response.razorpay_payment_id;
-          alert("🎉 Payment Success via Razorpay! Payment ID: " + rzpPaymentId);
-          
-          const orderData = {
-            id: txnId,
-            username: currentUser,
-            contact: currentUser !== 'Guest' ? currentUser : 'razorpay_user',
-            product: prodName,
-            duration: selectedDurationObj.name,
-            price: `₹${selectedDurationObj.price}`,
-            method: 'RAZORPAY',
-            utr: rzpPaymentId,
-            date: new Date().toLocaleString(),
-            status: 'Approved'
-          };
+      // 1. Request create-order from backend
+      fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amtInPaise })
+      })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(errData => { throw new Error(errData.error || 'Server error'); });
+        }
+        return res.json();
+      })
+      .then(orderData => {
+        if (!orderData.success) {
+          alert("Failed to create Razorpay order: " + (orderData.error || "Unknown error"));
+          return;
+        }
 
-          let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-          orders.push(orderData);
-          localStorage.setItem('orders', JSON.stringify(orders));
-
-          let keys = JSON.parse(localStorage.getItem('keys') || '[]');
-          const keyIdx = keys.findIndex(k => k.product === prodName && k.status === 'Unused');
-          
-          if (keyIdx !== -1) {
-            keys[keyIdx].status = 'Used';
-            keys[keyIdx].assignedTo = currentUser !== 'Guest' ? currentUser : 'razorpay_user';
-            keys[keyIdx].orderId = txnId;
-            keys[keyIdx].useDate = new Date().toLocaleDateString();
-            globallyAllocatedKey = keys[keyIdx].key;
-          } else {
-            globallyAllocatedKey = generateRandomKey();
-            keys.push({
-              key: globallyAllocatedKey,
+        // 2. Open Razorpay Checkout modal
+        const options = {
+          "key": orderData.key_id,
+          "amount": orderData.amount,
+          "currency": "INR",
+          "name": "HYPER X OFFICIAL",
+          "description": `${prodName} - ${selectedDurationObj.name}`,
+          "image": "https://cdn-icons-png.flaticon.com/512/3408/3408474.png",
+          "order_id": orderData.order_id,
+          "handler": function (response) {
+            // 3. Send payment tokens to verify-payment endpoint
+            const verifyPayload = {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              
+              txnId: txnId,
+              username: currentUser,
+              contact: currentUser !== 'Guest' ? currentUser : 'razorpay_user',
               product: prodName,
               duration: selectedDurationObj.name,
-              date: new Date().toLocaleDateString(),
-              status: 'Used',
-              assignedTo: currentUser !== 'Guest' ? currentUser : 'razorpay_user',
-              orderId: txnId,
-              useDate: new Date().toLocaleDateString()
+              price: `₹${selectedDurationObj.price}`
+            };
+
+            fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(verifyPayload)
+            })
+            .then(vRes => {
+              if (!vRes.ok) {
+                return vRes.json().then(errData => { throw new Error(errData.error || 'Verification failed'); });
+              }
+              return vRes.json();
+            })
+            .then(vData => {
+              if (vData.success) {
+                alert("🎉 Payment Success via Razorpay! Payment ID: " + response.razorpay_payment_id);
+                globallyAllocatedKey = vData.key;
+                document.getElementById('generated-key-val').innerText = globallyAllocatedKey;
+                document.getElementById('success-modal').classList.add('active');
+              } else {
+                alert("⚠️ Payment verification failed: " + (vData.error || "Invalid signature"));
+              }
+            })
+            .catch(err => {
+              alert("Error verifying payment signature on server: " + err.message);
             });
+          },
+          "prefill": {
+            "name": currentUser !== 'Guest' ? currentUser : '',
+            "email": `${currentUser.toLowerCase()}@hyperx.com`,
+            "contact": ""
+          },
+          "theme": {
+            "color": "#ff0033"
+          },
+          "modal": {
+            "ondismiss": function() {
+              alert("Payment checkout was closed by the user.");
+            }
           }
-          localStorage.setItem('keys', JSON.stringify(keys));
+        };
 
-          document.getElementById('generated-key-val').innerText = globallyAllocatedKey;
-          document.getElementById('success-modal').classList.add('active');
-        },
-        "prefill": {
-          "name": currentUser !== 'Guest' ? currentUser : '',
-          "email": `${currentUser.toLowerCase()}@hyperx.com`,
-          "contact": ""
-        },
-        "theme": {
-          "color": "#ff0033"
+        try {
+          const rzp = new Razorpay(options);
+          rzp.on('payment.failed', function (resp) {
+            alert("❌ Payment Failed!\nReason: " + resp.error.description + "\nCode: " + resp.error.code);
+          });
+          rzp.open();
+        } catch (err) {
+          alert("Razorpay Checkout failed to open: " + err.message + "\nMake sure the backend is configured with correct API keys.");
         }
-      };
-
-      try {
-        const rzp = new Razorpay(options);
-        rzp.open();
-      } catch (err) {
-        alert("Razorpay Checkout failed to open: " + err.message + "\nMake sure you entered a valid Razorpay Key ID in the Admin Panel.");
-      }
+      })
+      .catch(err => {
+        alert("Error creating payment order on server: " + err.message);
+      });
     }
 
     function copyTextToClipboard(text) {
@@ -1118,16 +1152,7 @@
     }
     drawWave();
 
-    // Key Generation Helper
-    function generateRandomKey() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let r = '';
-      for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 4; j++) r += chars[Math.floor(Math.random() * chars.length)];
-        if (i < 3) r += '-';
-      }
-      return 'HYPER-' + r;
-    }
+
 
     let globallyAllocatedKey = '';
 
@@ -1207,6 +1232,6 @@
       }
     }
   </script>
-  <script src="interactions.js"></script>
+  <script src="interactions.js" defer></script>
 </body>
 </html>

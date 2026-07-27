@@ -7,6 +7,7 @@
   <title>HYPER X – Client Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="db-sync.js" as="script">
   <style>
     :root {
       --red: #E50914;
@@ -30,6 +31,12 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      touch-action: manipulation;
     }
 
     body {
@@ -818,9 +825,7 @@
       document.getElementById('profile-email').value = currentUserData.email || '';
       document.getElementById('profile-photo-url').value = currentUserData.avatar || '';
       
-      // DNA Info
-      document.getElementById('dna-uid').textContent = '#' + (currentUserData.uid || 'USER_GM');
-      document.getElementById('dna-date').textContent = currentUserData.registryDate || 'Jul 05, 2026';
+
       
       // Set values for Referral link
       document.getElementById('refer-link').value = window.location.origin + "/index.html?ref=" + currentUserData.username;
@@ -1072,7 +1077,22 @@
     document.addEventListener('DOMContentLoaded', () => {
       checkLogin();
     });
+
+    // Listen to database updates from sync engine to dynamically update dashboard data
+    window.addEventListener('db-updated', () => {
+      try {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const updatedUser = users.find(u => u.username === currentUserData.username);
+        if (updatedUser) {
+          currentUserData = updatedUser;
+          localStorage.setItem('currentUserData', JSON.stringify(currentUserData));
+        }
+        updateStatsUI();
+        loadWalletInfo();
+        loadUserKeys();
+      } catch(e) {}
+    });
   </script>
-  <script src="interactions.js"></script>
+  <script src="interactions.js" defer></script>
 </body>
 </html>

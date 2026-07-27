@@ -41,6 +41,29 @@ const defaultProducts = {
   ]
 };
 
+// Initialize categories list
+const defaultCategories = [
+  { id: "android", name: "Android Panel" },
+  { id: "pc", name: "PC Panel" },
+  { id: "ios", name: "iOS Panel" },
+  { id: "ff", name: "Free Fire ID" },
+  { id: "mystery", name: "Mystery Box" },
+  { id: "pcgame", name: "PC Game Panel" }
+];
+let categories;
+try {
+  const storedCats = localStorage.getItem('categories');
+  if (storedCats) {
+    categories = JSON.parse(storedCats);
+  }
+} catch (e) {
+  console.error("Failed to parse categories from localStorage", e);
+}
+if (!categories || !Array.isArray(categories) || categories.length === 0) {
+  categories = defaultCategories;
+  localStorage.setItem('categories', JSON.stringify(defaultCategories));
+}
+
 // Check if products exist in localStorage, if not save defaults
 let products;
 try {
@@ -77,7 +100,7 @@ function makeCard(p) {
   const themeColor = colorMatch ? colorMatch[0] : '#ff0033';
   
   const imgContent = p.image
-    ? `<img src="${p.image}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><div class="card-img-inner" style="display:none; background:${p.gradient || 'linear-gradient(135deg,#ff0033,#1a0000)'}"><span>${p.emoji || '&#9889;'}</span></div>`
+    ? `<img src="${p.image}" alt="${p.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><div class="card-img-inner" style="display:none; background:${p.gradient || 'linear-gradient(135deg,#ff0033,#1a0000)'}"><span>${p.emoji || '&#9889;'}</span></div>`
     : `<div class="card-img-inner" style="background:${p.gradient || 'linear-gradient(135deg,#ff0033,#1a0000)'}"><span>${p.emoji || '&#9889;'}</span></div>`;
     
   // Use product durations if >= 1, else fall back to defaults
@@ -85,6 +108,16 @@ function makeCard(p) {
   const durEncoded = encodeURIComponent(JSON.stringify(durList));
   const pEncoded   = encodeURIComponent(JSON.stringify(p));
   
+  // Format features into high-contrast checkmark chips
+  const rawFeatures = (p.features || '').toString();
+  const featItems = rawFeatures.split(/[,|\n]+/).map(f => f.trim()).filter(Boolean);
+  const featuresHTML = featItems.length > 0 
+    ? featItems.map(f => {
+        const clean = f.replace(/^[✓✔📄\s]+/, '');
+        return `<span class="feature-chip"><span class="chip-check">✓</span> ${clean}</span>`;
+      }).join('')
+    : `<span class="feature-chip"><span class="chip-check">✓</span> Instant License</span>`;
+
   return `
     <div class="card" style="border: 1px solid ${themeColor}; box-shadow: 0 0 10px ${themeColor}44;">
       <div class="card-img">
@@ -96,124 +129,109 @@ function makeCard(p) {
           <button class="view-details-btn" onclick="viewDetails(decodeURIComponent('${pEncoded}'))">VIEW DETAILS</button>
         </div>
       </div>
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-features">${featuresHTML}</div>
+        <div class="card-footer">
+          <div class="card-price"><span>&#8377;</span>${p.price}.00</div>
+          <button class="buy-btn" onclick="buyNow('${p.name}',${p.price},'${durEncoded}')">BUY NOW</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+
 function renderGrid(id, items) {
   const el = document.getElementById(id);
   if (el) el.innerHTML = (items || []).map(makeCard).join('');
 }
 
-const defaultCategories = [
-  { key: 'android', name: 'Android Panel' },
-  { key: 'pc', name: 'PC Panel' },
-  { key: 'ff', name: 'Free Fire ID' },
-  { key: 'mystery', name: 'Mystery Box' },
-  { key: 'ios', name: 'iOS Panel' },
-  { key: 'pcgame', name: 'PC Game Panel' }
-];
-
-function getCategories() {
-  let cats = localStorage.getItem('categories');
-  if (!cats) {
-    cats = JSON.stringify(defaultCategories);
-    localStorage.setItem('categories', cats);
+// Render dynamic navigation links and product sections
+function initializeDynamicSections() {
+  const cats = JSON.parse(localStorage.getItem('categories') || '[]');
+  const navLinks = document.getElementById('nav-links');
+  const subNavList = document.getElementById('sub-nav-links-list');
+  const sectionsContainer = document.getElementById('dynamic-sections-container');
+  
+  if (navLinks && subNavList && sectionsContainer) {
+    let navHTML = `<a href="#home" class="mobile-nav-link active" onclick="document.getElementById('nav-links').classList.remove('open')">HOME</a>`;
+    let subNavHTML = `<li><a href="#home" class="sub-nav-link active">Home</a></li>`;
+    let sectionsHTML = '';
+    
+    cats.forEach(cat => {
+      navHTML += `<a href="#${cat.id}" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">${cat.name.toUpperCase()}</a>`;
+      subNavHTML += `<li><a href="#${cat.id}" class="sub-nav-link">${cat.name}</a></li>`;
+      sectionsHTML += `
+        <section class="sec" id="${cat.id}">
+          <div class="sec-header"><span class="slash">/</span><h2>${cat.name.toUpperCase()}</h2></div>
+          <div class="grid" id="${cat.id}-grid"></div>
+        </section>
+      `;
+    });
+    
+    navLinks.innerHTML = navHTML;
+    subNavList.innerHTML = subNavHTML;
+    sectionsContainer.innerHTML = sectionsHTML;
   }
-  return JSON.parse(cats);
 }
 
-function renderStorefrontLayout() {
-  const cats = getCategories();
-  
-  // Render Desktop Navigation Links
-  const desktopNav = document.getElementById('desktop-nav-container');
-  if (desktopNav) {
-    desktopNav.innerHTML = `<a href="#home" class="desktop-nav-link active">HOME</a>` +
-      cats.map(c => `<a href="#${c.key}" class="desktop-nav-link">${c.name.toUpperCase()}</a>`).join('');
-  }
+// Initial render
+initializeDynamicSections();
 
-  // Render Mobile Navigation Drawer Links
-  const mobileNav = document.getElementById('nav-links');
-  if (mobileNav) {
-    mobileNav.innerHTML = `<a href="#home" class="mobile-nav-link active" onclick="document.getElementById('nav-links').classList.remove('open')">HOME</a>` +
-      cats.map(c => `<a href="#${c.key}" class="mobile-nav-link" onclick="document.getElementById('nav-links').classList.remove('open')">${c.name.toUpperCase()}</a>`).join('');
-  }
-
-  // Render Mobile Sub-navigation Row
-  const subNav = document.getElementById('sub-nav-container');
-  if (subNav) {
-    subNav.innerHTML = `<li><a href="#home" class="sub-nav-link active">Home</a></li>` +
-      cats.map(c => `<li><a href="#${c.key}" class="sub-nav-link">${c.name}</a></li>`).join('');
-  }
-
-  // Render Dynamic Catalog Sections
-  const sectionsContainer = document.getElementById('storefront-sections-container');
-  if (sectionsContainer) {
-    sectionsContainer.innerHTML = cats.map(c => `
-      <section class="sec" id="${c.key}">
-        <div class="sec-header"><span class="slash">/</span><h2>${c.name.toUpperCase()}</h2></div>
-        <div class="grid" id="${c.key}-grid"></div>
-      </section>
-    `).join('');
-  }
-
-  // Render Footer Products Links
-  const footerProducts = document.getElementById('footer-products-container');
-  if (footerProducts) {
-    footerProducts.innerHTML = `<h4>Products</h4>` +
-      cats.map(c => `<a href="#${c.key}">${c.name}</a>`).join('');
-  }
-
-  // Render grids with products
-  let allProds = {};
-  try {
-    allProds = JSON.parse(localStorage.getItem('products')) || products;
-  } catch (e) {
-    allProds = products;
-  }
-  
-  cats.forEach(c => {
-    renderGrid(`${c.key}-grid`, allProds[c.key]);
+// Render all product grids
+function renderAllGrids() {
+  const cats = JSON.parse(localStorage.getItem('categories') || '[]');
+  cats.forEach(cat => {
+    const gridEl = document.getElementById(`${cat.id}-grid`);
+    if (gridEl) {
+      renderGrid(`${cat.id}-grid`, products[cat.id] || []);
+    }
   });
 }
+renderAllGrids();
 
-// Render storefront layout on load
-renderStorefrontLayout();
-
-// ===== SEARCH FILTER =====
+// ===== SEARCH FILTER (DEBOUNCED) =====
+let searchDebounceTimeout = null;
 function filterStorefrontProducts(query) {
-  const q = (query || '').toLowerCase().trim();
-  let allProds = {};
-  try {
-    allProds = JSON.parse(localStorage.getItem('products')) || defaultProducts;
-  } catch (e) {
-    allProds = defaultProducts;
-  }
-
-  const cats = getCategories();
-  
-  cats.forEach(c => {
-    const grid = document.getElementById(c.key + '-grid');
-    const sec = document.getElementById(c.key);
-    if (!grid) return;
-    const items = allProds[c.key] || [];
-    
-    let filtered = items;
-    if (q) {
-      filtered = items.filter(p =>
-        (p.name || '').toLowerCase().includes(q) ||
-        (p.features || '').toLowerCase().includes(q)
-      );
+  clearTimeout(searchDebounceTimeout);
+  searchDebounceTimeout = setTimeout(() => {
+    const q = (query || '').toLowerCase().trim();
+    let allProds = {};
+    try {
+      allProds = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+    } catch (e) {
+      allProds = defaultProducts;
     }
+
+    const cats = JSON.parse(localStorage.getItem('categories') || '[]');
     
-    renderGrid(c.key + '-grid', filtered);
-    
-    if (sec) {
-      if (filtered.length === 0) {
-        sec.style.display = 'none';
-      } else {
-        sec.style.display = 'block';
+    cats.forEach(cat => {
+      const grid = document.getElementById(cat.id + '-grid');
+      const sec = document.getElementById(cat.id);
+      if (!grid) return;
+      const items = allProds[cat.id] || [];
+      
+      let filtered = items;
+      if (q) {
+        filtered = items.filter(p =>
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.features || '').toLowerCase().includes(q)
+        );
       }
-    }
-  });
-
+      
+      renderGrid(cat.id + '-grid', filtered);
+      
+      if (sec) {
+        if (filtered.length === 0) {
+          sec.style.display = 'none';
+        } else {
+          sec.style.display = 'block';
+        }
+      }
+    });
+  }, 120); // 120ms debounce to keep input completely fluid and lag-free
+}
 
 // ===== VIEW DETAILS MODAL =====
 let detailProduct = null;
@@ -499,8 +517,7 @@ function saveQuickEdit() {
   // Update the product in localStorage
   const products = JSON.parse(localStorage.getItem('products') || '{}');
   let updated = false;
-  getCategories().forEach(c => {
-    const cat = c.key;
+  ['android','pc','ff','mystery','ios','pcgame'].forEach(cat => {
     if (products[cat]) {
       products[cat] = products[cat].map(prod => {
         if (prod.name === p.name && prod.price === p.price) {
@@ -562,9 +579,12 @@ function saveQuickEdit() {
 
     // Re-render all grids to reflect changes
     const allProds = JSON.parse(localStorage.getItem('products') || '{}');
-    getCategories().forEach(c => {
-      renderGrid(c.key + '-grid', allProds[c.key]);
-    });
+    renderGrid('android-grid', allProds.android);
+    renderGrid('pc-grid', allProds.pc);
+    renderGrid('ff-grid', allProds.ff);
+    renderGrid('mystery-grid', allProds.mystery);
+    renderGrid('ios-grid', allProds.ios);
+    renderGrid('pcgame-grid', allProds.pcgame);
 
     // Flash success
     const btn = document.querySelector('[onclick="saveQuickEdit()"]');
@@ -642,50 +662,44 @@ function withWallet() {
   }
 
   // Deduct balance and approve
+  // Check if enough unused keys matching the product and selected duration exist in the database
+  let keys = JSON.parse(localStorage.getItem('keys') || '[]');
+  const matchingUnusedKeys = keys.filter(k => 
+    k.product === p.name && 
+    k.status === 'Unused' && 
+    k.duration === selectedObj.name
+  );
+
+  if (matchingUnusedKeys.length < detailSelectedQty) {
+    alert(`❌ Out of Stock!\n\nThis product currently does not have enough unused keys available for the selected duration (${selectedObj.name}) in stock.\n\nPlease contact the Admin to add more keys.`);
+    return;
+  }
+
+  // Deduct balance and approve
   if (confirm(`Confirm purchase of "${p.name} - ${selectedObj.name}" (Qty: ${detailSelectedQty}) for ₹${totalPrice}.00 using your wallet balance?`)) {
     // Deduct
     users[uIdx].balance = userBalance - totalPrice;
     users[uIdx].keysClaimed = (users[uIdx].keysClaimed || 0) + detailSelectedQty;
     localStorage.setItem('users', JSON.stringify(users));
 
-    // Generate keys helper
-    function generateRandomKey() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let r = '';
-      for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 4; j++) r += chars[Math.floor(Math.random() * chars.length)];
-        if (i < 3) r += '-';
-      }
-      return 'HYPER-' + r;
-    }
-
-    let keys = JSON.parse(localStorage.getItem('keys') || '[]');
     let allocatedKeys = [];
     const orderId = 'WL-' + Math.floor(100000 + Math.random() * 900000);
 
     for (let q = 0; q < detailSelectedQty; q++) {
-      const keyIdx = keys.findIndex(k => k.product === p.name && k.status === 'Unused');
-      let allocatedKey = '';
+      // Find the first matching key
+      const keyIdx = keys.findIndex(k => 
+        k.product === p.name && 
+        k.status === 'Unused' && 
+        k.duration === selectedObj.name
+      );
+      
       if (keyIdx !== -1) {
         keys[keyIdx].status = 'Used';
         keys[keyIdx].assignedTo = currentUser;
         keys[keyIdx].orderId = orderId;
         keys[keyIdx].useDate = new Date().toLocaleDateString();
-        allocatedKey = keys[keyIdx].key;
-      } else {
-        allocatedKey = generateRandomKey();
-        keys.push({
-          key: allocatedKey,
-          product: p.name,
-          duration: selectedObj.name,
-          date: new Date().toLocaleDateString(),
-          status: 'Used',
-          assignedTo: currentUser,
-          orderId: orderId,
-          useDate: new Date().toLocaleDateString()
-        });
+        allocatedKeys.push(keys[keyIdx].key);
       }
-      allocatedKeys.push(allocatedKey);
     }
     localStorage.setItem('keys', JSON.stringify(keys));
 
@@ -985,6 +999,18 @@ document.addEventListener('keydown', e => {
     closeModal('mykeys-modal');
     closeModal('detail-modal');
     closeVideoModal();
+  }
+});
+
+// Listen to database update events from sync engine to dynamically redraw storefront catalog without refresh
+window.addEventListener('db-updated', () => {
+  try {
+    products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+    categories = JSON.parse(localStorage.getItem('categories')) || defaultCategories;
+    initializeDynamicSections();
+    renderAllGrids();
+  } catch (e) {
+    console.error("Failed to re-render storefront on database update:", e);
   }
 });
 
